@@ -1,0 +1,112 @@
+\documentclass[12pt]{article}
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{csquotes}
+
+\begin{document}
+
+\begin{titlepage}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+\center
+
+\textsc{\LARGE Karlsruher Institut für }\\[0.5cm]
+\textsc{\LARGE Technologie} \\[1.5cm]
+\textsc{\Large KASTEL Praktikum}\\[0.5cm]
+
+\HRule \\[0.4cm]
+{ \huge \bfseries Angriffe auf WPA2 PSK}\\[0.4cm] %TODO: Titel
+\HRule \\[1.5cm]
+ 
+
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Authoren:}\\
+Florian D. \textsc{Loch} \\
+Benny \textsc{Görzig}
+\end{flushleft}
+\end{minipage}
+~
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Supervisor:} \\
+Dr. Erik \textsc{Krempel}
+\end{flushright}
+\end{minipage}\\[2cm]
+
+\includegraphics{logo}\\[1cm] 
+
+{\large \today}\\[1cm]
+
+\vfill 
+
+\end{titlepage}
+
+\tableofcontents
+
+\section{Einleitung}
+Intro
+
+\section{Grundlagen}
+Fokus eher auf WPA2/PSK
+Wir werden natürlich nicht den vollständigen IEEE 802.11a, b, g, n und ac (...) Standard beschreiben, aber wichtige Grundlagen für die Angriffe
+\subsection{Sicherheitsmechanismen bei 802.11}
+
+\subsection{Management Frames}
+Beacon Frames, Deauthentification Frames, Probe Requests/Responses
+
+\subsection{WPA2}
+
+\section{Angriffe}
+Im Rahmen dieser Ausarbeitung wollen wir uns auf die Ermittlung des gemeinsamen PSK als Angriffsziel und auf den Angriffsvektor des Brechens des PSK durch Exploration des Schlüsselraumes beschränken. Tatsächlich gibt es nach dem bekannten Stand der Forschung keinen effizienteren Angriff auf WPA2 PSK (TODO Quelle) -- auf Grund der Aufmerksamkeit, der sich dieses Thema unter Netzwerkexperten und Kryptologen in der Vergangenheit erfreute, ist nicht damit zu rechnen, dass in dem Verfahren noch grundlegende Schwachstellen gefunden werden. Durch die nachfolgend beschriebene "Auskunfsfreudigkeit" der meisten Endgeräte ergeben sich weitere Ansätze zur Ermittlung des PSK. So zielt bspw. das Tool Fluxium (TODO Verweis und Fußnote mit Kurzfassung der Idee) auf die Manipulierbarkeit des Nutzers ab. Diese Ansätze sollen jedoch nicht weiter besprochen werden.
+
+Diese Art von Angriff unterteilt sich in zwei Schritte: Erstens die Erfassung eines WPA2-Handshakes und zweitens die nachgelagerte Suche nach dem Schlüssel\footnote{Theoretisch könnten auch mehrere potenzielle Schlüssel zu einer Hashkollision führen. Aufgrund der Längenbeschränkung von WPA2-Schlüsseln und der Güte der eingesetzten Hash-Verfahren ist dies jedoch äußerst unwahrscheinlich und in der Praxis nicht von Belang.}, der zu einem identischen Hashwert führen würde.
+
+\subsection{Erfassen eines WPA2-Handshakes}
+\subsubsection{Deauthentication-Angriff}
+\subsubsection{\enquote{Evil-Twin}-Angriff}
+
+\subsection{Handshake Bruteforcing}
+Dabei gibt es zwei populäre Herangehensweisen zum Erfassen eines WPA2-Handshakes (TODO gibt es noch weitere? Literatur als Beleg!): 
+
+Angriff in die Breite ist ein Thema, welches Erik interessiert. Einfaches Einsammeln vieler Handshakes und Vergleichen mit einem einmal berechneten Hash nicht möglich, da Hash eine Nonce enthält und somit Handshake auch bei gleicher Passphrase verschiedene Hashes enthält. Allerdings sind die "verschiedenen Stufen des Bruteforcens" (damit meine ich: Kontextabhängige Passwörter (bspw. (modifizierte) SSID) , Wörterbuch häufiger Passwörter, Kombinieren verschiedener Wörterbucheinträge bzw. Kombinieren mit Zahlen, tatsächliche, systematische Exploration des Suchraumes) unterschiedlich effizient. So dürfte die Wahrscheinlichkeit, dass ein Passwort einem Wort X aus einem Wörterbuch entspricht deutlich höher sein, als dass es einer gänzlich zufälligen Ziffern-/Zeichenfolge y entspricht. Es sollte daher auf die Idee eingegangen werde, sich auf Wörterbuchangriffe zu beschränken, diese jedoch auf eine Vielzahl von Handshakes (ausgehend von einem Endgerät) loszulassen. Üblicherweise dürften die meisten Nutzer sich in der Vergangenheit auch mit WLANs mit schlechten Passwörtern verbunden haben, daher wird nach der "lowest hanging fruit" gesucht. Soll gezielt die Kommunikation mit einem Netzwerk belauscht werden ist dies nicht von Nutzen, für eine Vielzahl anderer Angriffe jedoch durchaus, bspw. für einen MITM-Angriff via Evil-Twin, DNS-Hijacking, ARP-Spoofing etc..
+
+\section{Durchführung}
+Dürfen wir erklären wie genau die Angriffe mit Software umzusetzen sind? Finde ich persönlich interessant.
+Können wir an such auch mit Sektion \enquote{Angriffe} mergen, es soll ja kein Tutorial werden
+
+\subsection{\enquote{Evil Twin} Angriff}
+
+\subsection{Deauthentication (Angriff?)}
+
+\section{Ergebnisse}
+Hier kommt der zweite (und der womöglich größte) Teil der Arbeit rein, nämlich die Ergebnisse unserer Studien:
+
+\subsection{Welche Endgeräte senden SSIDs bekannter APs?}
+Welche Endgeräte senden alle bekannten APs mit? (Einteilung nach Hersteller möglich)  
+Ist die Frequenz der Probes interessant?
+
+\subsection{Anfalligkeit der Endgeräte: Evil Twin}
+(geht ein wenig einher mit dem Aussenden bekannter SSIDs, aber nicht unbedingt, da ich den Evil Twin Angriff auch auf Stationen anwenden kann, die gerade mit einem AP verbunden sind)
+Nicht alle Endgeräte connecten automatisch mit dem Evil Twin
+Windows Phone scheint sich nicht nur die SSID+MAC (die wir beide spoofen können) zu merken, sondern auch gewisse Netzwerkeinstellungen für den AP ("airbase-ng -Z 2" flag setzten um WPA2 AP aufzubauen)
+
+\subsection{Deauthentication-Verhalten von APs}
+Sollte nur relativ kurz werden, also welche Szenarien haben wir betrachtet (Heimnetzwerke, Bahnhof mit öffentlichen Netzwerken, AP in Firmennetzwerk) und wie oft/üblich sind deauths (im Heimnetzwerken von Haus mit 7 APs kein einziges deauth Paket in c.a. 24h, Firmennetzwerk mit c.a. 30 Teilnehmern in Reichweite des Accesspoints: rund 2,2 deauth Pakete pro Minute, reason codes variieren)
+Welche Reason Codes sind üblich, was ist die jeweilige Erklärung für das auftreten eines konkreten Reason Codes?
+\begin{itemize}
+	\item 1: unspecified reason 
+    \item 2: previous authentication no longer valid --> Client has associated but is not authorised
+    \item 6: Class 2 frame received from nonauthenticated STA --> Client attempted to transfer data before it was authenticated
+   	\item 8: Disassociated because sending STA is leaving (or has left) BSS --> Operating System moved the client to another access point using non-aggressive load balancing (OS hat entschieden den AP zu wechseln)  
+\end{itemize}
+
+\section{Ausblick}
+Was kann mit der abgefangenen Handshakes angestellt werden? 
+Wie kann ich den Payload einer Nachricht als Evil Twin mitlesen? 
+
+\end{document}
