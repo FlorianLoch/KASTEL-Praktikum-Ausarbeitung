@@ -1,0 +1,21 @@
+\section{Ergebnisse}
+Hier kommt der zweite (und der womöglich größte) Teil der Arbeit rein, nämlich die Ergebnisse unserer Studien:
+
+\subsection{Welche Endgeräte senden SSIDs bekannter APs?}
+Welche Endgeräte senden alle bekannten APs mit? (Einteilung nach Hersteller möglich)  
+Ist die Frequenz der Probes interessant?
+
+\subsection{Anfalligkeit der Endgeräte: Evil Twin}
+(geht ein wenig einher mit dem Aussenden bekannter SSIDs, aber nicht unbedingt, da ich den Evil Twin Angriff auch auf Stationen anwenden kann, die gerade mit einem AP verbunden sind)
+Nicht alle Endgeräte connecten automatisch mit dem Evil Twin
+Windows Phone scheint sich nicht nur die SSID+MAC (die wir beide spoofen können) zu merken, sondern auch gewisse Netzwerkeinstellungen für den AP ("airbase-ng -Z 2" flag setzten um WPA2 AP aufzubauen)
+
+\subsection{Deauthentication-Verhalten von APs}
+Sollte nur relativ kurz werden, also welche Szenarien haben wir betrachtet (Heimnetzwerke, Bahnhof mit öffentlichen Netzwerken, AP in Firmennetzwerk) und wie oft/üblich sind deauths (im Heimnetzwerken von Haus mit 7 APs kein einziges deauth Paket in c.a. 24h, Firmennetzwerk mit c.a. 30 Teilnehmern in Reichweite des Accesspoints: rund 2,2 deauth Pakete pro Minute, reason codes variieren)
+Welche Reason Codes sind üblich, was ist die jeweilige Erklärung für das auftreten eines konkreten Reason Codes?
+\begin{itemize}
+	\item 1: unspecified reason 
+    \item 2: previous authentication no longer valid --> Client has associated but is not authorised
+    \item 6: Class 2 frame received from nonauthenticated STA --> Client attempted to transfer data before it was authenticated
+   	\item 8: Disassociated because sending STA is leaving (or has left) BSS --> Operating System moved the client to another access point using non-aggressive load balancing (OS hat entschieden den AP zu wechseln)  
+\end{itemize}
