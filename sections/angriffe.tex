@@ -1,10 +1,26 @@
 \section{Angriffe}
-Im Rahmen dieser Ausarbeitung wollen wir uns auf die Ermittlung des gemeinsamen PSK als Angriffsziel und auf den Angriffsvektor des Brechens des PSK durch Exploration des Schlüsselraumes beschränken. Tatsächlich gibt es nach dem bekannten Stand der Forschung keinen effizienteren Angriff auf WPA2 PSK (TODO Quelle) -- auf Grund der Aufmerksamkeit, der sich dieses Thema unter Netzwerkexperten und Kryptologen in der Vergangenheit erfreute, ist nicht damit zu rechnen, dass in dem Verfahren noch grundlegende Schwachstellen gefunden werden. Durch die nachfolgend beschriebene "Auskunfsfreudigkeit" der meisten Endgeräte ergeben sich weitere Ansätze zur Ermittlung des PSK. So zielt bspw. das Tool Fluxium (TODO Verweis und Fußnote mit Kurzfassung der Idee) auf die Manipulierbarkeit des Nutzers ab. Diese Ansätze sollen jedoch nicht weiter besprochen werden.
+Im Rahmen dieser Ausarbeitung wollen wir uns auf die Ermittlung des gemeinsamen \textit{Pre-Shared Key} (folgend PSK) als Angriffsziel und auf den Angriffsvektor des Brechens des PSK durch Exploration des Schlüsselraumes beschränken. 
+Oftmals ein schwach gewähltes Geheimnis offline via Wörterbuchangriff in realistischer Zeit gebrochen werden.
+%Tatsächlich gibt es nach dem bekannten Stand der Forschung keinen effizienteren Angriff auf WPA2 PSK (TODO Quelle) -- aufgrund der Aufmerksamkeit, der sich dieses Thema unter Netzwerkexperten und Kryptologen in der Vergangenheit erfreute, ist nicht damit zu rechnen, dass in dem Verfahren noch grundlegende Schwachstellen gefunden werden. 
+%TODO: Stimmt wohl nicht, siehe https://dl.aircrack-ng.org/breakingwepandwpa.pdf Formulierung ist auch sehr gewagt, es kann immer was passieren ;)
 
-Diese Art von Angriff unterteilt sich in zwei Schritte: Erstens die Erfassung eines WPA2-Handshakes und zweitens die nachgelagerte Suche nach dem Schlüssel\footnote{Theoretisch könnten auch mehrere potenzielle Schlüssel zu einer Hashkollision führen. Aufgrund der Längenbeschränkung von WPA2-Schlüsseln und der Güte der eingesetzten Hash-Verfahren ist dies jedoch äußerst unwahrscheinlich und in der Praxis nicht von Belang.}, der zu einem identischen Hashwert führen würde.
+Durch die nachfolgend beschriebene "Auskunftsfreudigkeit" der meisten Endgeräte ergeben sich weitere Ansätze zur Ermittlung des PSK. 
+So zielt bspw. das Tool Fluxion\footnote{Fluxion ist ein Netzwerk-Tool welches seinen Benutzern erlaubt einen sog. Fake Access Point zu kreieren. Clients, die sich mit diesem Access Point verbinden, werden auf eine manipulierte Kopie der Login-Seite des originalen Access Points weitergeleitet und dazu verleitet, sich erneut mithilfe ihres PSK zu authentifizieren.} auf die Manipulierbarkeit des Nutzers ab~\cite{fluxion}. 
+Dieser und weitere praktisch durchführbare Angriffe, wie sie beispielsweise in~\cite{caneill2010attacks} beschrieben sind, sollen in dieser Ausarbeitung jedoch nicht weiter betrachtet werden.
+
+Die Ermittlung des PSKs eines Netzwerkes unterteilt sich in zwei Schritte: Erstens die Erfassung eines WPA2-Handshakes und zweitens die nachgelagerte Suche nach einem Schlüssel, der zu einem identischen Hashwert führen würde.
+%TODO: Finde die Formulierung von dir oben schon ausreichend, außerdem ist der Footnote Bereich sonst zu groß
+%\footnote{Theoretisch könnten auch mehrere potenzielle Schlüssel zu einer Hashkollision führen. Aufgrund der Längenbeschränkung von WPA2-Schlüsseln und der Güte der eingesetzten Hash-Verfahren ist dies jedoch äußerst unwahrscheinlich und in der Praxis nicht von Belang.}
 
 \subsection{Erfassen eines WPA2-Handshakes}
+Im Folgenden soll erläutert werden, welche Möglichkeiten ein Angreifer besitzt den für den Bruteforce-Angriff nötigen Handshake zu ermitteln. 
+Die wohl einfachste Methode ist es den Netzwerkverkehr zu überwachen bis sich ein Client an einem Access Point im gewünschten Netzwerk authentifiziert. 
+Abhängig von der Netzwerkinfrastruktur und des Verhaltens der Clients kann dies jedoch viel Zeit in Anspruch nehmen.
+Daher werden wir zwei mögliche Angriffe beschreiben, die durch aktives Eingreifen in den Netzwerkverkehr die Authentifikation der Clients erzwingen.
+
 \subsubsection{Deauthentication-Angriff}
+
+
 \subsubsection{\enquote{Evil-Twin}-Angriff}
 
 \subsection{Handshake Bruteforcing}
