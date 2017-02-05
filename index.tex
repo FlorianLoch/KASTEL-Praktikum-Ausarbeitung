@@ -1,10 +1,19 @@
-\documentclass[12pt]{article}
-\usepackage[english]{babel}
-\usepackage[utf8x]{inputenc}
+\documentclass[a4,12pt,ngerman,listof=numbered]{scrartcl}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{minted}
+\usepackage[activate]{microtype}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage{csquotes}
+\usepackage{setspace}
+\usepackage[hidelinks]{hyperref}
+\usepackage[backend=bibtex,style=numeric,sorting=none,date=long,hyperref=true]{biblatex} %sorting=none sorts by position of appearance
+
+\addbibresource{lit} 
 
 \begin{document}
 
@@ -25,5 +34,9 @@
 \input{sections/ergebnisse.tex}
 
 \input{sections/ausblick.tex}
+
+\appendix	
+
+\input{sections/appendix.tex}
 
 \end{document}
