@@ -1,2 +1,10 @@
-\section{Einleitung}
-Intro, Hinweis darauf, dass kein effizienterer Angriff auf WPA2 PSK Schlüssel als tatsächliches Brechen von Handshakes bekannt ist. Bisher keine Schwächen im Protokoll oder den verwendeten Kryptoprimitiven bekannt.
+\section{Motivation}
+Drahtlose Netzwerke, insbesondere IEEE 802.11, sind seit Jahren allgegenwärtig und werden in ihrer Bedeutung sicher noch weiter zunehmen. Egal ob in Büroräumen, in Universitäten oder dem eigenen Wohnzimmer - WLAN, ist nicht wegzudenken -- so verfügen viele Endgeräte mittlerweile auch gar nicht mehr direkt über tatsächliche Anschlüsse für kabelgebundene Netzwerke; ganze andere Klassen von Endgeräten wurden erst durch WiFis möglich bzw. nützlich: Smartphones, Tablets etc..
+
+Wohl niemand hat ernsthafte Bedenken, wenn er in drahtlosen Netzen kommuniziert -- ungeschützte, öffentliche Hotspots einmal ausgelassen. Und dass, obwohl gerade diese Netze aus physikalischer Sicht besonders exponiert sind -- die schlichte Nähe zum Zugangspunkt genügt, um aktiv in die Kommunikation einzugreifen.
+
+Doch durch entsprechenden Schutz auf Schicht zwei des ISO/OSI-Modells sollen Vertraulichkeit und Integrität aller darüberliegenden Protokolle transparent gewahrt werden.
+
+Nachdem mit WEP ein nur unzureichendes Verfahren entwickelt und auf den Markt gebracht worden war, um diese Ziele umzusetzen, wurde mit WPA eine Teilmenge der in Entwicklung befindenden \enquote{Robust Secure Network}-Spezifikation (RSN bzw. 802.11i TODO Quelle) als vorübergehender Standard verabschiedet. Seit 2004 ist der komplette RSN-Standard unter der Namen WPA2 dabei, die alten Verfahren vollständig zu ersetzen.	
+
+Bezüglich der grundlegenden, theoretischen Sicherheit von WPA2(-PSK) und den kryptographischen Primitiven gibt es in der Wissenschaft keinen Zweifel \footnote{2012 wurde das Verfahren nach 8 Jahren Einsatz weiterhin als sicher angesehen \cite{kumkar2012}, seitdem sind keine nennenswerten Schwachstellen gefunden worden.} -- diese Arbeit widmet sich daher der Frage, wie praxisrelevant Bruteforce-Angriffe auf WPA2-PSK sind, wie sie funktionieren und ob daher in der Praxis tatsächlich sorglos auf 802.11i gesetzt werden sollte.
