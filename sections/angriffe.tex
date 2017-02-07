@@ -41,6 +41,27 @@ Versendet der Angreifer nun den Deauthentication-Frame an den Client wird dieser
 Folglich wird ein neuer Handshake vom Client initiiert, der vom Angreifer mitgeschnitten werden kann.
 
 \subsubsection{\enquote{Evil-Twin}-Angriff}
+Ein Nachteil des Deauthentication-Angriffs ist, dass sowohl der Client als auch der Access-Point in Reichweite des Angreifers sein müssen (on-site) um den Handshake zwischen beiden abfangen zu können.
+Um den PSK eines WPA2-Netzwerks zu Bruteforcen ist jedoch kein vollständiger Handshake notwendig.
+Den Angreifer benötigt lediglich folgende Informationen:
+\begin{itemize}
+	\item SSID des Netzwerkes 
+	\item MAC-Adressen der Handshaketeilnehmer
+	\item ANonce aus Schritt 1
+	\item SNonce inklusive MIC aus Schritt 2
+\end{itemize}
+Die Parameter, die vom Access-Point übermittelt werden, unterliegen keinerlei Schutz und werden nicht auf Authentizität geprüft.
+Der Angreifer kann demnach die ANonce und MAC-Adresse beliebig wählen und den Handshake bis zu Schritt zwei durchführen.
+Um die übrigen Parameter zu erhalten (SNonce inklusive MIC) muss der Angreifer dem Client ein authentisches, ihm bekanntes Netzwerk vortäuschen.
+Dafür öffnet der Angreifer einen eigenen Access-Point mit der SSID des Zielnetzwerks und passender Konfiguration: den sogenannten Evil-Twin.
+Die Konfiguration entspricht einer der folgenden Möglichkeiten: Open, WEP, WPA-PSK, WPA-Enterprise, WPA2-PSK, WPA2-Enterprise.
+Der Angreifer rät nun die richtige Konfiguration oder öffnet alternativ mehrere Access-Points die alle Möglichkeiten abdecken.
+Ist das Zielnetzwerk bekannt (und somit auch die SSID), so ist der Evil-Twin einsatzbereit und funktionsfähig.
+
+Oft ist jedoch ein konkreter Client Ziel des Angriffs (zum Beispiel Man in the Middle) und die dem Client bekannten Netzwerke sind dem Angreifer verborgen.
+In diesem Fall bedient sich der Angreifer der in Sektion~\ref{Einleitung oder so} beschriebenen Probe-Requests, die vom Client kontinuierlich gesendet werden.
+Aus diesen kann der Angreifer die SSIDs auslesen und gegebenenfalls mehrere Access-Points öffnen.
+Die gesammelten Handshakes dienen als Grundlage für einen Angriff in die Breite: Anstelle komplexere Passwörter als Kandidaten gewählt werden wird nach der \enquote{lowest hanging fruit}, also dem Netzwerk mit dem schwächsten PSK gesucht
 
 \subsection{Handshake Bruteforcing}
 Dabei gibt es zwei populäre Herangehensweisen zum Erfassen eines WPA2-Handshakes (TODO gibt es noch weitere? Literatur als Beleg!): 
