@@ -59,9 +59,30 @@ Der Angreifer rät nun die richtige Konfiguration oder öffnet alternativ mehrer
 Ist das Zielnetzwerk bekannt (und somit auch die SSID), so ist der Evil-Twin einsatzbereit und funktionsfähig.
 
 Oft ist jedoch ein konkreter Client Ziel des Angriffs (zum Beispiel Man in the Middle) und die dem Client bekannten Netzwerke sind dem Angreifer verborgen.
-In diesem Fall bedient sich der Angreifer der in Sektion~\ref{Einleitung oder so} beschriebenen Probe-Requests, die vom Client kontinuierlich gesendet werden.
+In diesem Fall bedient sich der Angreifer der in Sektion~\ref{Einleitungoderso} beschriebenen Probe-Requests, die vom Client kontinuierlich gesendet werden.
 Aus diesen kann der Angreifer die SSIDs auslesen und gegebenenfalls mehrere Access-Points öffnen.
-Die gesammelten Handshakes dienen als Grundlage für einen Angriff in die Breite: Anstelle komplexere Passwörter als Kandidaten gewählt werden wird nach der \enquote{lowest hanging fruit}, also dem Netzwerk mit dem schwächsten PSK gesucht
+Die gesammelten Handshakes dienen als Grundlage für einen Angriff in die Breite: Anstelle komplexere Passwörter als Kandidaten gewählt werden wird nach der \enquote{lowest hanging fruit}, also dem Netzwerk mit dem schwächsten PSK gesucht.
+
+\paragraph{Durchführung}
+Für den Evil-Twin Angriff bietet Aircrack-ng zwei mögliche Herangehensweisen, die folgend näher beleuchtet werden sollen.
+Weiß der Angreifer im Vorfeld für welche SSID er den Evil-Twin öffnen möchte, so kann er dafür den folgenden Befehl verwenden:
+\\\texttt{airbase-ng start --essid <SSID> -Z 4 -w <Dateiname> wlan0mon}\\
+Durch das Flag \texttt{-Z 4} wird sich der Evil-Twin als WPA2-PSK geschützter Access-Point ausgeben.
+Mithilfe des Flags \texttt{-w} wird der Netzwerkverkehr zwischen dem Evil-Twin und den Clients mitgeschnitten.
+Versucht sich ein Client nun mit dem Evil-Twin zu verbinden wird der Handshake bis zu Schritt zwei durchgeführt, mitgeschnitten und in dem Dump \texttt{<Dateiname>} gespeichert.
+Danach wird die Authentifikation im Schritt 3 abgebrochen.
+Dies äußert sich beim Client in Form einer Fehlermeldung wie zum Beispiel: \enquote{Fehler bei der Authentifizierung}.
+Es können beliebig viele Evil-Twins auf dem selben Interface geöffnet werden. 
+Dies ist nützlich, wenn mehrere Handshakes eines Clients von verschiedenen Netzwerken abgefangen werden sollen oder die Sicherheitskonfiguration eines konkreten Netzwerks unbekannt ist.
+In letzterem Fall werden mehrere Evil-Twins mit gleicher SSID, aber unterschiedlichen Flags geöffnet (z.B.\texttt{-z 4} für WPA-PSK). %TODO: Commands prüfen
+
+
+Besitzt der Angreifer hingegen keine bekannten SSIDs seines Ziels, so kann er das \texttt{-P} Flag unter Airbase verwenden ohne eine SSID anzugeben:
+\\\texttt{airbase-ng start -P -Z 4 wlan0mon}\\
+Airbase wird nun auf dem ausgewählten Interface Probe-Requests von Clients mitlesen und auswerten um automatisch Evil-Twins mit der vom Angreifer spezifizierten Sicherheitskonfiguration zu erzeugen.
+Wir empfehlen im Hintergrund einen \texttt{airodump-ng} Prozess laufen zu lassen, der den Verkehr des Evil-Twins separat aufzeichnet.
+Dies hat den Hintergrund, dass die Aufzeichnung von \texttt{airbase-ng} ohne spezifizierte SSID via \texttt{--essid} den Wert \texttt{default} als Netzwerknamen verwendet anstelle des Wertes aus der Probe-Requests.
+Ohne gültige SSID werden die Handshakes unbrauchbar, da diese in die Berechnung des PMK mit einfließt.
 
 \subsection{Handshake Bruteforcing}
 Nachdem die notwendigen Schritte des Handshakes erfolgreich abgefangen wurden kann der Angreifer den PSK offline brechen.
@@ -79,7 +100,4 @@ Folgende Schritte sind dafür nötig:
 Den Großteil des Rechenaufwands benötigt das bilden des PMKs in Schritt 1 über 4096 Runden PBKDF2.
 Des weiteren können nur selten PMK-Listen vorab generiert werden, da der PMK auch von der SSID des Netzwerkes abhängig ist.
 
-
-Dabei gibt es zwei populäre Herangehensweisen zum Erfassen eines WPA2-Handshakes (TODO gibt es noch weitere? Literatur als Beleg!): 
-
-Angriff in die Breite ist ein Thema, welches Erik interessiert. Einfaches Einsammeln vieler Handshakes und Vergleichen mit einem einmal berechneten Hash nicht möglich, da Hash eine Nonce enthält und somit Handshake auch bei gleicher Passphrase verschiedene Hashes enthält. Allerdings sind die "verschiedenen Stufen des Bruteforcens" (damit meine ich: Kontextabhängige Passwörter (bspw. (modifizierte) SSID) , Wörterbuch häufiger Passwörter, Kombinieren verschiedener Wörterbucheinträge bzw. Kombinieren mit Zahlen, tatsächliche, systematische Exploration des Suchraumes) unterschiedlich effizient. So dürfte die Wahrscheinlichkeit, dass ein Passwort einem Wort X aus einem Wörterbuch entspricht deutlich höher sein, als dass es einer gänzlich zufälligen Ziffern-/Zeichenfolge y entspricht. Es sollte daher auf die Idee eingegangen werde, sich auf Wörterbuchangriffe zu beschränken, diese jedoch auf eine Vielzahl von Handshakes (ausgehend von einem Endgerät) loszulassen. Üblicherweise dürften die meisten Nutzer sich in der Vergangenheit auch mit WLANs mit schlechten Passwörtern verbunden haben, daher wird nach der "lowest hanging fruit" gesucht. Soll gezielt die Kommunikation mit einem Netzwerk belauscht werden ist dies nicht von Nutzen, für eine Vielzahl anderer Angriffe jedoch durchaus, bspw. für einen MITM-Angriff via Evil-Twin, DNS-Hijacking, ARP-Spoofing etc..
+%Angriff in die Breite ist ein Thema, welches Erik interessiert. Einfaches Einsammeln vieler Handshakes und Vergleichen mit einem einmal berechneten Hash nicht möglich, da Hash eine Nonce enthält und somit Handshake auch bei gleicher Passphrase verschiedene Hashes enthält. Allerdings sind die "verschiedenen Stufen des Bruteforcens" (damit meine ich: Kontextabhängige Passwörter (bspw. (modifizierte) SSID) , Wörterbuch häufiger Passwörter, Kombinieren verschiedener Wörterbucheinträge bzw. Kombinieren mit Zahlen, tatsächliche, systematische Exploration des Suchraumes) unterschiedlich effizient. So dürfte die Wahrscheinlichkeit, dass ein Passwort einem Wort X aus einem Wörterbuch entspricht deutlich höher sein, als dass es einer gänzlich zufälligen Ziffern-/Zeichenfolge y entspricht. Es sollte daher auf die Idee eingegangen werde, sich auf Wörterbuchangriffe zu beschränken, diese jedoch auf eine Vielzahl von Handshakes (ausgehend von einem Endgerät) loszulassen. Üblicherweise dürften die meisten Nutzer sich in der Vergangenheit auch mit WLANs mit schlechten Passwörtern verbunden haben, daher wird nach der "lowest hanging fruit" gesucht. Soll gezielt die Kommunikation mit einem Netzwerk belauscht werden ist dies nicht von Nutzen, für eine Vielzahl anderer Angriffe jedoch durchaus, bspw. für einen MITM-Angriff via Evil-Twin, DNS-Hijacking, ARP-Spoofing etc..
