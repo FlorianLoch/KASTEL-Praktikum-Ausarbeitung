@@ -64,6 +64,22 @@ Aus diesen kann der Angreifer die SSIDs auslesen und gegebenenfalls mehrere Acce
 Die gesammelten Handshakes dienen als Grundlage für einen Angriff in die Breite: Anstelle komplexere Passwörter als Kandidaten gewählt werden wird nach der \enquote{lowest hanging fruit}, also dem Netzwerk mit dem schwächsten PSK gesucht
 
 \subsection{Handshake Bruteforcing}
+Nachdem die notwendigen Schritte des Handshakes erfolgreich abgefangen wurden kann der Angreifer den PSK offline brechen.
+Dafür spielt er die Schritte, die Client und Access-Point während dem Handshake durchführen, lokal nach und wählt dabei in jedem Versuch einen neuen Passwortkandidaten.
+Folgende Schritte sind dafür nötig:
+\begin{enumerate}
+	\item Berechne $PMK = PBKDF2(SSID, PSK, 4096)$
+	\item Verwende die aufgezeichneten Noncen und berechne damit \\$PMK = PRF(Client-MAC, Access-Point-MAC, SNonce, ANonce, PMK)$
+	\item Bilde den MIC über den PMK Kandidaten und vergleiche ihn mit dem aufgezeichneten
+	\begin{enumerate}
+		\item MICs sind ungleich: gehe zu Schritt 1
+		\item MICs sind gleich: Handshake erfolgreich gebrochen
+	\end{enumerate}
+\end{enumerate}
+Den Großteil des Rechenaufwands benötigt das bilden des PMKs in Schritt 1 über 4096 Runden PBKDF2.
+Des weiteren können nur selten PMK-Listen vorab generiert werden, da der PMK auch von der SSID des Netzwerkes abhängig ist.
+
+
 Dabei gibt es zwei populäre Herangehensweisen zum Erfassen eines WPA2-Handshakes (TODO gibt es noch weitere? Literatur als Beleg!): 
 
 Angriff in die Breite ist ein Thema, welches Erik interessiert. Einfaches Einsammeln vieler Handshakes und Vergleichen mit einem einmal berechneten Hash nicht möglich, da Hash eine Nonce enthält und somit Handshake auch bei gleicher Passphrase verschiedene Hashes enthält. Allerdings sind die "verschiedenen Stufen des Bruteforcens" (damit meine ich: Kontextabhängige Passwörter (bspw. (modifizierte) SSID) , Wörterbuch häufiger Passwörter, Kombinieren verschiedener Wörterbucheinträge bzw. Kombinieren mit Zahlen, tatsächliche, systematische Exploration des Suchraumes) unterschiedlich effizient. So dürfte die Wahrscheinlichkeit, dass ein Passwort einem Wort X aus einem Wörterbuch entspricht deutlich höher sein, als dass es einer gänzlich zufälligen Ziffern-/Zeichenfolge y entspricht. Es sollte daher auf die Idee eingegangen werde, sich auf Wörterbuchangriffe zu beschränken, diese jedoch auf eine Vielzahl von Handshakes (ausgehend von einem Endgerät) loszulassen. Üblicherweise dürften die meisten Nutzer sich in der Vergangenheit auch mit WLANs mit schlechten Passwörtern verbunden haben, daher wird nach der "lowest hanging fruit" gesucht. Soll gezielt die Kommunikation mit einem Netzwerk belauscht werden ist dies nicht von Nutzen, für eine Vielzahl anderer Angriffe jedoch durchaus, bspw. für einen MITM-Angriff via Evil-Twin, DNS-Hijacking, ARP-Spoofing etc..
