@@ -36,9 +36,43 @@ Dafür erstellt er ein Deauthentication-Frame und setzt:
 	\item als Basic Service Set Identifier (BSSID) die MAC-Adresse des Access-Points
 	\item einen selbst gewählten Reason Code in den Body
 \end{itemize}
+Abbildung~\ref{fig:deauth-attack} zeigt ein solches Deauthentication-Frame sowie die vom Angreifer zu modifizierenden Felder.
 Alternativ kann der Client als Absender und der Access-Point als Adressat angegeben werden.
-Versendet der Angreifer nun den Deauthentication-Frame an den Client wird dieser, getäuscht durch den gefälschten Absender, die aktive Verbindung zum Access Point unterbrechen und eine Neuauthentifizierung anfragen.
+Versendet der Angreifer nun das Deauthentication-Frame an den Client wird dieser, getäuscht durch den gefälschten Absender, die aktive Verbindung zum Access Point unterbrechen und eine Neuauthentifizierung durchführen wollen.
 Folglich wird ein neuer Handshake vom Client initiiert, der vom Angreifer mitgeschnitten werden kann.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.95\textwidth]{graphics/deauth-attack}
+	\caption{Für einen Deauth-Angriff müssen lediglich die MAC-Adressen des Access-Points und des Clients bekannt.}
+	\label{fig:deauth-attack}
+\end{figure}
+
+\paragraph{Durchführung}
+Zur Durchführung des Deauthentication-Angriffs müssen zwei Bedingungen erfüllt sein: 
+\begin{itemize}
+	\item der Angreifer ist in Reichweite des Clients
+	\item der Client ist mit einem Access-Points des Zielnetzwerks verbunden 
+\end{itemize}
+Zunächst versetzt der Angreifer sein Netzwerkinterface (z.B. \texttt{wlan0}) in den Monitor-Mode und beendet störende Hintergrundprozesse:
+\texttt{airmon-ng check kill}\\
+\texttt{airmon-ng start <Interface>}\\
+Dies ermöglicht das Überwachen des Netzwerkverkehrs und das aussenden eigens erstellter Frames.
+Um potentielle Handshakes und andere Pakete aufzuzeichnen verwendet der Angreifer \texttt{airodump-ng}:
+\texttt{airodump-ng -c <Channel> --bssid <AP-MAC> -w <Dateiname> <Interface>}
+Das Flag \texttt{--bssid} ist dabei optional.
+Es verhindert, dass Pakete von anderen Access-Points aufgezeichnet werden und kann somit die nachträgliche Analyse erleichtern.
+Sind die MAC-Adresse des Clients und des Access-Points bekannt startet der Angreifer mit Hilfe von \texttt{aireplay-ng} den Deauthentication-Angriff: 
+\texttt{aireplay-ng -0 <Anzahl> -a <AP-MAC> -c <Client-MAC> <Interface>}
+Das Flag \texttt{-0} kennzeichnet den Deauthentication-Angriff.
+Via \texttt{<Anzahl>} kann spezifiziert werden, wie viele Deauthentication-Frames an das Ziel gesendet werden.
+Ein Nachteil dieses Ansatzes ist, dass \texttt{aireplay-ng} mit dem Aussenden der Deauthentication-Frames wartet bis es einen Beacon-Frame des Access-Points erhalten hat.
+Alternativ kann die Deauthentifikation \enquote{manuell} mithilfe von \texttt{Scapy} durchgeführt werden:
+\texttt{Scapy Script hier}
+Nach dem Angriff stoppen wir die eingangs gestartete Netzwerkaufzeichung von \texttt{airodump-ng} und analysieren den Dump mithilfe eines geeigneten Tools, zum Beispiel \texttt{Pyrit}:
+\texttt{pyrit -r <Dump-Name> -b <AP-MAC> analyze}
+Wurde die MAC-Adresse des Access-Points nicht beim Aufzeichnen des Verkehrs spezifiziert sollte sie nun mit dem Flag \texttt{-b} festgelegt werden.
+Andernfalls wird \texttt{Pyrit} für eventuell weitere aufgezeichnete Handshakes von anderen Netzwerken mit einer positive Rückmeldung antworten.
 
 \subsubsection{\enquote{Evil-Twin}-Angriff}
 Ein Nachteil des Deauthentication-Angriffs ist, dass sowohl der Client als auch der Access-Point in Reichweite des Angreifers sein müssen (on-site) um den Handshake zwischen beiden abfangen zu können.
@@ -65,8 +99,9 @@ Die gesammelten Handshakes dienen als Grundlage für einen Angriff in die Breite
 
 \paragraph{Durchführung}
 Für den Evil-Twin Angriff bietet Aircrack-ng zwei mögliche Herangehensweisen, die folgend näher beleuchtet werden sollen.
+Zunächst muss, wie beim Deauthentication-Angriff bereits beschrieben, das Netzwerkinterface in den Monitor-Mode versetzt werden.
 Weiß der Angreifer im Vorfeld für welche SSID er den Evil-Twin öffnen möchte, so kann er dafür den folgenden Befehl verwenden:
-\\\texttt{airbase-ng start --essid <SSID> -Z 4 -w <Dateiname> wlan0mon}\\
+\\\texttt{airbase-ng start --essid <SSID> -Z 4 -F <Dateiname> <interface>}\\
 Durch das Flag \texttt{-Z 4} wird sich der Evil-Twin als WPA2-PSK geschützter Access-Point ausgeben.
 Mithilfe des Flags \texttt{-w} wird der Netzwerkverkehr zwischen dem Evil-Twin und den Clients mitgeschnitten.
 Versucht sich ein Client nun mit dem Evil-Twin zu verbinden wird der Handshake bis zu Schritt zwei durchgeführt, mitgeschnitten und in dem Dump \texttt{<Dateiname>} gespeichert.
@@ -78,11 +113,11 @@ In letzterem Fall werden mehrere Evil-Twins mit gleicher SSID, aber unterschiedl
 
 
 Besitzt der Angreifer hingegen keine bekannten SSIDs seines Ziels, so kann er das \texttt{-P} Flag unter Airbase verwenden ohne eine SSID anzugeben:
-\\\texttt{airbase-ng start -P -Z 4 wlan0mon}\\
+\\\texttt{airbase-ng start -P -Z 4 <interface>}\\
 Airbase wird nun auf dem ausgewählten Interface Probe-Requests von Clients mitlesen und auswerten um automatisch Evil-Twins mit der vom Angreifer spezifizierten Sicherheitskonfiguration zu erzeugen.
-Wir empfehlen im Hintergrund einen \texttt{airodump-ng} Prozess laufen zu lassen, der den Verkehr des Evil-Twins separat aufzeichnet.
-Dies hat den Hintergrund, dass die Aufzeichnung von \texttt{airbase-ng} ohne spezifizierte SSID via \texttt{--essid} den Wert \texttt{default} als Netzwerknamen verwendet anstelle des Wertes aus der Probe-Requests.
-Ohne gültige SSID werden die Handshakes unbrauchbar, da diese in die Berechnung des PMK mit einfließt.
+Wir empfehlen gleichzeitig einen \texttt{airodump-ng} Prozess zu starten, der den Verkehr des Evil-Twins separat aufzeichnet.
+Dies hat den Hintergrund, dass die Aufzeichnung von \texttt{airbase-ng} ohne spezifizierte SSID via \texttt{--essid} Flag den Wert \texttt{default} als Netzwerknamen verwendet anstelle des Wertes aus der Probe-Requests.
+Ohne gültige SSID werden diese Handshakes jedoch unbrauchbar, da diese in die Berechnung des PMK mit einfließt.
 
 \subsection{Handshake Bruteforcing}
 Nachdem die notwendigen Schritte des Handshakes erfolgreich abgefangen wurden kann der Angreifer den PSK offline brechen.
@@ -99,5 +134,7 @@ Folgende Schritte sind dafür nötig:
 \end{enumerate}
 Den Großteil des Rechenaufwands benötigt das bilden des PMKs in Schritt 1 über 4096 Runden PBKDF2.
 Des weiteren können nur selten PMK-Listen vorab generiert werden, da der PMK auch von der SSID des Netzwerkes abhängig ist.
+
+\paragraph{Durchführung}
 
 %Angriff in die Breite ist ein Thema, welches Erik interessiert. Einfaches Einsammeln vieler Handshakes und Vergleichen mit einem einmal berechneten Hash nicht möglich, da Hash eine Nonce enthält und somit Handshake auch bei gleicher Passphrase verschiedene Hashes enthält. Allerdings sind die "verschiedenen Stufen des Bruteforcens" (damit meine ich: Kontextabhängige Passwörter (bspw. (modifizierte) SSID) , Wörterbuch häufiger Passwörter, Kombinieren verschiedener Wörterbucheinträge bzw. Kombinieren mit Zahlen, tatsächliche, systematische Exploration des Suchraumes) unterschiedlich effizient. So dürfte die Wahrscheinlichkeit, dass ein Passwort einem Wort X aus einem Wörterbuch entspricht deutlich höher sein, als dass es einer gänzlich zufälligen Ziffern-/Zeichenfolge y entspricht. Es sollte daher auf die Idee eingegangen werde, sich auf Wörterbuchangriffe zu beschränken, diese jedoch auf eine Vielzahl von Handshakes (ausgehend von einem Endgerät) loszulassen. Üblicherweise dürften die meisten Nutzer sich in der Vergangenheit auch mit WLANs mit schlechten Passwörtern verbunden haben, daher wird nach der "lowest hanging fruit" gesucht. Soll gezielt die Kommunikation mit einem Netzwerk belauscht werden ist dies nicht von Nutzen, für eine Vielzahl anderer Angriffe jedoch durchaus, bspw. für einen MITM-Angriff via Evil-Twin, DNS-Hijacking, ARP-Spoofing etc..
