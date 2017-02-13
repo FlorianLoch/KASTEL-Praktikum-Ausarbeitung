@@ -3,7 +3,19 @@ Fokus eher auf WPA2/PSK
 Wir werden natürlich nicht den vollständigen IEEE 802.11a, b, g, n und ac (...) Standard beschreiben, aber wichtige Grundlagen für die Angriffe
 \subsection{Sicherheitsmechanismen bei 802.11}
 
-\subsection{Management Frames}
+\subsection{Management-Frames}
+Neben den Datenframes zur Übertragung von Nutzdaten existieren im IEEE 802.11-Standard noch Kontroll- und Managementframes. Kontrollframes dienen dabei der Steuerung des Zugriffs auf das Übertragungsmedium, Managementframes zur Verwaltung der Funkzelle.\footcite[S. 180]{rechWLAN}
+
+Diese drei Kategorien lassen sich weiter in einzelne Frame-Typen untergliedern; die nachfolgend beschriebenen Frames fallen dabei in die Kategorie der Managementframes. Ihre Übertragung erfolgt unverschlüsselt (und damit auch gänzlich unauthentifiziert), was ein Auslesen (im Fall der Probe-Requests und -Responses) sowie das Spoofen von Frames (bei Deauthentification-Frames) ermöglicht.
+
+\subsubsection{Beacon-Frames}
+Beacon-Frames werden von einem Access Point (AP) versendet, um das ausgestrahlte Netzwerk bzw. dessen Konfiguration für Stationen in Reichweite bekannt zu machen. 
+\subsubsection{Probe-Request- und Probe-Response-Frames}
+
+\subsubsection{Deauthentification-Frames}
+
+Gerade bei Deauthentification-Frames birgt die unverschlüsselte, unauthentifizierte Übertragung ein Risiko dar -- ein in Reichweite befindlicher Angreifer kann hiermit eine erneute Authentifizierung des Clients forcieren (siehe TODO REF DeauthAttack) und unter Einsatz moderater Sendeleistung Angriffe gegen die Netzwerkverfügbarkeit einzelner Stationen in der Funkzelle fahren.
+
 Beacon Frames, Deauthentification Frames, Probe Requests/Responses
 
 \subsection{WPA2}
