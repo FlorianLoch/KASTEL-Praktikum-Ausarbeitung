@@ -9,8 +9,10 @@ Neben den Datenframes zur Übertragung von Nutzdaten existieren im IEEE 802.11-S
 Diese drei Kategorien lassen sich weiter in einzelne Frame-Typen untergliedern; die nachfolgend beschriebenen Frames fallen dabei in die Kategorie der Managementframes. Ihre Übertragung erfolgt unverschlüsselt (und damit auch gänzlich unauthentifiziert), was ein Auslesen (im Fall der Probe-Requests und -Responses) sowie das Spoofen von Frames (bei Deauthentification-Frames) ermöglicht.
 
 \subsubsection{Beacon-Frames}
-Beacon-Frames werden von einem Access Point (AP) versendet, um das ausgestrahlte Netzwerk bzw. dessen Konfiguration für Stationen in Reichweite bekannt zu machen. 
+Beacon-Frames werden von einem Access Point (AP) periodisch -- meist vielfach in einer Sekunde -- versendet, um das ausgestrahlte Netzwerk bzw. dessen Konfiguration für Stationen in Reichweite bekannt zu machen. Neben der SSID enthalten diese unter anderem den Kanal, auf dem der AP sendet, sowie die (Sicherheits-)Konfiguration (Übertragungsraten, verwendetes Sicherungsverfahren etc.). Im Fall von versteckten Netzwerken (\enquote{Hidden networks}) werden keine Beacon-Frames vom AP ausgesendet.
+
 \subsubsection{Probe-Request- und Probe-Response-Frames}
+Mit Hilfe von Probe-Requests ist es einem Client möglich von sich aus nach einem Netzwerk in Reichweite zu suchen, von dem er bereits die SSID kennt. Neben den möglichen Übertragungsraten enthält ein Probe-Request-Frame die hier wesentliche SSID des zu suchenden Netzwerkes. Ein in Reichweite befindlicher AP, der dem über die SSID identifizierten Netzwerk zugeordnet ist antwortet daraufhin mit einem Probe-Reponse-Frame -- allerdings nur, wenn die angegeben Übertragungsraten mit dem Netzwerk kompatibel sind. Aus technischer Sicht ist die Verwendung nur im Falle versteckter Netzwerke erforderlich -- die von uns in der Praxis beobachtete Sendefrequenz der Beacon-Frames ist so hoch, dass es der gezielten Nachfrage seitens des Clients eigentlich nicht bedarf. Diese Feststellung ist wichtig, da ein Endgerät hierdurch ihm bekannte Gegenstellen verrät. Dadurch wird er identifizierbar sowie anfällig für den in TODO REF vorgestellten \enquote{Evil-Twin}-Angriff.
 
 \subsubsection{Deauthentification-Frames}
 
