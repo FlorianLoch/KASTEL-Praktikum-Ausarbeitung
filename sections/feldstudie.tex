@@ -15,19 +15,56 @@ Diese variieren jedoch in ihrer Frequenz und Fülle abhängig vom Endgerät.
 Wir haben Smartphones und Laptops verschiedener Hersteller auf ihr Verhalten geprüft:
 \begin{itemize}
 	\item Nokia Lumia 530 (Windows 8.1)
-	\item Elephone P9000 und Samsung Galaxy S7 (Android 6), saskdjnakjsd (Android 5) %TODO!
+	\item Elephone P9000, Samsung Galaxy S7, Samsung Galaxy S6 Edge (Android 6)
 	\item Lenovo Thinkpad T550 (Windows 10)
 	\item Apple MacBook Pro 15 (Mid 2015), Apple MacBook Pro 13 () %TODO!
 \end{itemize}
-Windows 8.1 sowie Android 5/6 Smartphones wiesen einen ähnlichen Probe-Request-Verlauf auf und sendeten bis zum zehn Anfragen pro Minute aus.
+Der Netzwerkverkehr wurde mithilfe von \texttt{airodump-ng} aufgezeichnet und nachträglich mit eigens entwickelten Python-Scripten auf Grundlage von \texttt{Pyshark} analysiert und ausgewertet.
+
+
+Windows 8.1 sowie Android 6 Smartphones wiesen einen ähnlichen Probe-Request-Verlauf auf und sendeten bis zum 40 Anfragen pro Minute aus.
 Auffällig für die getesteten Android-Geräte war jedoch, dass mit steigender Anzahl bekannter SSIDs die Anzahl der Probe-Requests stiegen.
 Beim überwachen des relevanten Netzwerkverkehrs an öffentlichen Plätzen wurde die Auskunftsfreudigkeit von Android-Endgeräten bestätigt\footnote{Diese Werte sind natürlich nur approximativ, da wir aufgrund des Herstellers (Vendor-MAC) auf das Endgerät schließen mussten und Nutzerpräferenzen nicht berücksichtigen konnten.}. %TODO: noch was wegen MAC-Randomization erwähnen? Machts halt auch schwerer
-Weiterhin tendieren Android-Geräte dazu alle bekannten SSIDs burstartig binnen weniger hundert Millisekunden auf einmal zu versenden.
-Die Apple-Geräte sowie der Windows 10 Laptop hingegen schienen sparsamer mit Probe-Requests umzugehen und sendeten lediglich drei bis vier Anfragen pro Minute aus.
+Weiterhin tendieren Android-Geräte dazu alle bekannten SSIDs burstartig binnen weniger hundert Millisekunden zu versenden.
+Das Elephone P9000 sendete sogar weiter Probe-Requests, obwohl es mit einem Wireless-Netzwerk verbunden war.
+Wir vermuten an dieser Stelle, dass die Ursache Location-Services sind oder das Ziel, stärkere Netzwerke in Reichweite zu finden.
+Die Apple-Geräte sowie der Windows 10 Laptop hingegen schienen sparsamer mit Probe-Requests umzugehen.
+Diese sendeten lediglich drei bis zehn Anfragen pro Minute aus.
 Abschließend ist zu sagen, dass keines der getesteten Geräte gänzlich auf Probe-Requests verzichtet hat.
-Daher ist der Evil-Twin Angriff bezüglich der Einfachheit seiner Vorbereitung als durchaus praktikabel zu bewerten.
+Daher ist die Vorbereitung des Evil-Twin Angriffs als durchaus praktikabel zu bewerten.
 
 \subsection{Anfalligkeit der Endgeräte: Evil Twin}
+Nachdem festgestellt wurde, dass wir mit wenig Aufwand SSIDs aus Probe-Requests des Endgeräts erhalten können, wollen wir nun prüfen, ob eventuelle Schutzmechanismen gegen einen Evil-Twin Angriff existieren.
+Wir verwenden die Geräte des vorherigen Tests um ein möglichst breites Herstellersprektrum abzudecken.
+Auf allen Endgeräten wurde das WPA2-PSK geschützte Netzwerk mit der SSID \enquote{Tor-zum-Internet} zu der Liste bekannter Netzwerke hinzugefügt.
+Anschließend wurde, wie in der Durchführung erläutert, ein passender Evil-Twin mit der selben SSID via \texttt{airbase-ng} mit der passenden Konfiguration gestartet.
+Die Endgeräte wurden während der Durchführung des Angriffs nicht bedient und waren nicht in Reichweite anderer bekannter Netzwerke.
+
+An dieser Stelle ist es wichtig nochmals zu erwähnen, dass der Handshake im Schritt 3 vom Evil-Twin abgelehnt wird.
+Daraus resultiert unter anderem das unterschiedliche Verhalten der einzelnen Android-Endgeräte trotz gleicher Betriebssystemversion.
+So zeichnete sich das Samsung Galaxy S6 Edge durch ein aggressives Authentifizierungsverhalten aus: Mit einer Rate von ca. zwei Authentifizierungen pro Sekunde stoch dieses Endgerät besonders heraus.
+Da es sich immer mit dem stärksten verfügbaren Netzwerk verbunden hat, hatte das Smartphone keinen Internetzugang mehr (z.B. über mobiles Datenvolumen).
+In diesem Fall konnte der Evil-Twin also für einen Denial-of-Service Angriff missbraucht werden.
+Die übrigen Endgeräte haben nach zwei bis vier gescheiterten automatischen Authentifizierungen aufgegeben und sind auf die Nutzung von mobilem Internet zurückgefallen.
+Dieses Verhalten trat jedoch periodisch in Zeitabständen von 30 bis 60 Sekunden auf.
+Die einzige Ausnahme bildeten hier die Laptops die ohne Nutzeraktion keine weiteren Handshakes initiiert haben.
+
+Sind bekannte Alternativnetzwerke in Reichweite, so bevorzugen die meisten Endgeräte das stärkste Netzwerk und wechseln wenn nötig den Access-Point.
+Wir konnten dieses Verhalten bei allen Endgeräten Ausnutzen, um Endgeräte zur Authentifikation mit dem Evil-Twin zu verleiten.
+Nach dem gescheiterten Handshake sind sie jedoch wieder zum Alternativnetzwerk gewechselt.
+
+Ist der Typ des Netzwerks vorher nicht bekannt kann der Angreifer, wie in der Durchführung erwähnt, mehrere Evil-Twins auf dem Netzwerkinterface öffnen.
+Alle getesteten Endgeräte haben sich in diesem Fall mit dem Access-Point mit der passenden Sicherheitskonfiguration verbunden.
+Wurde absichtlich die falsche Konfiguration gewählt, so haben dies lediglich das Windows 8.1 Phone und der Windows 10 Laptop erkannt und den Nutzer entsprechend gewarnt. %TODO Bild hier
+Die übrigen Endgeräte haben sich somit in einem offenen Evil-Twin ohne jegliche Verschlüsselung locken lassen, womit einem Man-in-the-Middle Angriff Tür und Tor geöffnet wird.
+
+Zusammenfassend ist der Evil-Twin als ein wenig subtiler, jedoch hochflexibler Angriff zu bewerten.
+Jedes der geprüften Endgeräte sendet die notwendigen SSIDs aus was den Angriff auf ein konkretes Netzwerk aber auch den Angriff auf einen konkreten Client leicht gestaltet.
+Weiterhin ist der Evil-Twin der einzige Angriff der Off-site eingesetzt werden kann. 
+Somit ist kein realer Access-Point für das Erhalten des teilweisen Handshakes nötig.
+Eigenen Tests nach harmoniert der Evil-Twin Angriff sehr gut mit dem Deauthentication-Angriff.
+So kann ein bereits mit einem anderen Netzwerk verbundener Client so lange deauthentifiziert werden, bis er sich mit dem Evil-Twin verbindet.
+Der einzige Nachteil bleibt jedoch, dass der Evil-Twin im Netzwerk für alle sichtbar ist und somit leicht erkannt werden kann.
 
 (geht ein wenig einher mit dem Aussenden bekannter SSIDs, aber nicht unbedingt, da ich den Evil Twin Angriff auch auf Stationen anwenden kann, die gerade mit einem AP verbunden sind)
 Nicht alle Endgeräte connecten automatisch mit dem Evil Twin
@@ -37,14 +74,12 @@ Des weiteren verwenden Apple-Geräte MAC-Randomization um ihre eindeutige Identi
 Dieser Mechanismus hat jedoch keine Auswirkung a
 
 \subsection{Deauthentication-Verhalten von APs}
-
-Aus den Merkmalen der Pakete, wie z.B. Typ, Frequenz und Inhalt, können wir Eigenschaften ableiten mit denen wir die Angriffe bezüglich ihrer Praxistauglichkeit bewerten können.
-Hierfür wurde der Netzwerkverkehr in zwei verschiedenen Szenarien aufgezeichnet:
+In dieser Feldstudie wurde der Netzwerkverkehr in zwei verschiedenen Szenarien aufgezeichnet:
 \begin{enumerate}
 	\item \textbf{WPA2-PSK Heimnetzwerk} mit einem Access-Point und 8 Teilnehmern, die sich selten aus der Reichweite des Access-Points entfernen
 	\item \textbf{WPA2-Enterprise Firmennetzwerk} mit 3 Access-Points und ca. 30 Teilnehmern, die sich häufig zwischen den einzelnen Access-Points bewegen
 \end{enumerate}
-
+Aus den Merkmalen der Pakete, wie beispielsweise Typ, Frequenz und Inhalt, können wir Eigenschaften ableiten mit denen wir den Deauthentication-Angriff bezüglich seiner Praxistauglichkeit bewerten können.
 Sollte nur relativ kurz werden, also welche Szenarien haben wir betrachtet (Heimnetzwerke, Bahnhof mit öffentlichen Netzwerken, AP in Firmennetzwerk) und wie oft/üblich sind deauths (im Heimnetzwerken von Haus mit 7 APs kein einziges deauth Paket in c.a. 24h, Firmennetzwerk mit c.a. 30 Teilnehmern in Reichweite des Accesspoints: rund 2,2 deauth Pakete pro Minute, reason codes variieren)
 Welche Reason Codes sind üblich, was ist die jeweilige Erklärung für das auftreten eines konkreten Reason Codes?
 \begin{itemize}
