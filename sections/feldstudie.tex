@@ -1,16 +1,50 @@
 \section{Feldstudie}
-Hier kommt der zweite (und der womöglich größte) Teil der Arbeit rein, nämlich die Ergebnisse unserer Studien:
+Um die Praktikabilität der Angriffe zu verifizieren haben wir ihre Erfordernisse (z.B. das Aussenden von Probe-Requests) in mehreren Feldstudien überprüft.
+Hierfür wurde der Netzwerkverkehr in variierenden Umgebungen, sowie das Verhalten von Endgeräten gegenüber den Angriffen analysiert.
+Die Leitfragen des folgenden Kapitels sind dabei:
+\begin{itemize}
+	\item Welche Endgeräte senden in welcher Frequenz Probe-Requests?
+	\item Wie anfällig sind Endgeräte bezüglich dem Evil-Twin Angriff?
+	\item Können Deauthentication-Angriffe im eigenen Netzwerk erkannt werden?
+\end{itemize}
 
 \subsection{Probe-Request Verhalten der Endgeräte}
-Welche Endgeräte senden alle bekannten APs mit? (Einteilung nach Hersteller möglich)  
-Ist die Frequenz der Probes interessant?
+Um einen Evil-Twin Angriff zu ermöglichen benötigt der Angreifer eine oder mehrere SSIDs von Netzwerken, die dem anzugreifenden Endgerät bekannt sind.
+Hierfür wurden die Probe-Requests zu Hilfe gezogen, die Endgeräte periodisch aussenden um bekannte Netzwerke zu detektieren.
+Diese variieren jedoch in ihrer Frequenz und Fülle abhängig vom Endgerät.
+Wir haben Smartphones und Laptops verschiedener Hersteller auf ihr Verhalten geprüft:
+\begin{itemize}
+	\item Nokia Lumia 530 (Windows 8.1)
+	\item Elephone P9000 und Samsung Galaxy S7 (Android 6), saskdjnakjsd (Android 5) %TODO!
+	\item Lenovo Thinkpad T550 (Windows 10)
+	\item Apple MacBook Pro 15 (Mid 2015), Apple MacBook Pro 13 () %TODO!
+\end{itemize}
+Windows 8.1 sowie Android 5/6 Smartphones wiesen einen ähnlichen Probe-Request-Verlauf auf und sendeten bis zum zehn Anfragen pro Minute aus.
+Auffällig für die getesteten Android-Geräte war jedoch, dass mit steigender Anzahl bekannter SSIDs die Anzahl der Probe-Requests stiegen.
+Beim überwachen des relevanten Netzwerkverkehrs an öffentlichen Plätzen wurde die Auskunftsfreudigkeit von Android-Endgeräten bestätigt\footnote{Diese Werte sind natürlich nur approximativ, da wir aufgrund des Herstellers (Vendor-MAC) auf das Endgerät schließen mussten und Nutzerpräferenzen nicht berücksichtigen konnten.}. %TODO: noch was wegen MAC-Randomization erwähnen? Machts halt auch schwerer
+Weiterhin tendieren Android-Geräte dazu alle bekannten SSIDs burstartig binnen weniger hundert Millisekunden auf einmal zu versenden.
+Die Apple-Geräte sowie der Windows 10 Laptop hingegen schienen sparsamer mit Probe-Requests umzugehen und sendeten lediglich drei bis vier Anfragen pro Minute aus.
+Abschließend ist zu sagen, dass keines der getesteten Geräte gänzlich auf Probe-Requests verzichtet hat.
+Daher ist der Evil-Twin Angriff bezüglich der Einfachheit seiner Vorbereitung als durchaus praktikabel zu bewerten.
 
 \subsection{Anfalligkeit der Endgeräte: Evil Twin}
+
 (geht ein wenig einher mit dem Aussenden bekannter SSIDs, aber nicht unbedingt, da ich den Evil Twin Angriff auch auf Stationen anwenden kann, die gerade mit einem AP verbunden sind)
 Nicht alle Endgeräte connecten automatisch mit dem Evil Twin
 Windows Phone scheint sich nicht nur die SSID+MAC (die wir beide spoofen können) zu merken, sondern auch gewisse Netzwerkeinstellungen für den AP ("airbase-ng -Z 2" flag setzten um WPA2 AP aufzubauen)
 
+Des weiteren verwenden Apple-Geräte MAC-Randomization um ihre eindeutige Identität zu verschleiern und gezielte Angriffe gegen sie zu erschweren.
+Dieser Mechanismus hat jedoch keine Auswirkung a
+
 \subsection{Deauthentication-Verhalten von APs}
+
+Aus den Merkmalen der Pakete, wie z.B. Typ, Frequenz und Inhalt, können wir Eigenschaften ableiten mit denen wir die Angriffe bezüglich ihrer Praxistauglichkeit bewerten können.
+Hierfür wurde der Netzwerkverkehr in zwei verschiedenen Szenarien aufgezeichnet:
+\begin{enumerate}
+	\item \textbf{WPA2-PSK Heimnetzwerk} mit einem Access-Point und 8 Teilnehmern, die sich selten aus der Reichweite des Access-Points entfernen
+	\item \textbf{WPA2-Enterprise Firmennetzwerk} mit 3 Access-Points und ca. 30 Teilnehmern, die sich häufig zwischen den einzelnen Access-Points bewegen
+\end{enumerate}
+
 Sollte nur relativ kurz werden, also welche Szenarien haben wir betrachtet (Heimnetzwerke, Bahnhof mit öffentlichen Netzwerken, AP in Firmennetzwerk) und wie oft/üblich sind deauths (im Heimnetzwerken von Haus mit 7 APs kein einziges deauth Paket in c.a. 24h, Firmennetzwerk mit c.a. 30 Teilnehmern in Reichweite des Accesspoints: rund 2,2 deauth Pakete pro Minute, reason codes variieren)
 Welche Reason Codes sind üblich, was ist die jeweilige Erklärung für das auftreten eines konkreten Reason Codes?
 \begin{itemize}
