@@ -18,6 +18,7 @@ Mit Hilfe von Probe-Requests ist es einem Client möglich von sich aus nach eine
 
 Deauthentication-Frames können vom Access-Point (oder vom Client) versendet um eine Neuauthentifizierung des Clients beim Access-Point erfolgen zu lassen.
 Mögliche Gründe hierfür sind beispielsweise das umverteilen der Clients auf andere Access-Points im Netz, die Bewegung von Clients zwischen Access-Points oder die Neuaushandlung von Schlüsseln zugunsten der Vertraulichkeit.
+Der konkrete Grund kann mit einem sogenannten Reason-Code in Body des Frames genau spezifiziert werden.
 Gerade bei Deauthentification-Frames birgt die unverschlüsselte, unauthentifizierte Übertragung ein Risiko.
 So kann ein in Reichweite befindlicher Angreifer eine erneute Authentifizierung des Clients forcieren und unter Einsatz moderater Sendeleistung Angriffe gegen die Netzwerkverfügbarkeit einzelner Stationen in der Funkzelle fahren.
 
