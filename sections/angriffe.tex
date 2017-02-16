@@ -23,7 +23,7 @@ Die wohl subtilste Methode, die dem Angriefer zur Verfügung steht, ist es den N
 Abhängig von der Netzwerkinfrastruktur und des Verhaltens der Clients kann dies jedoch viel Zeit in Anspruch nehmen.
 Folgend werden zwei mögliche Angriffe beschrieben, die durch aktives Eingreifen in den Netzwerkverkehr die Authentifikation der Clients forcieren soll.
 
-\subsubsection{Deauthentication-Angriff}
+\subsubsection{Deauthentication-Angriff}\label{subs:deauthentication-attack}
 Wie in Sektion~\ref{Grundlagen} bereits beschrieben definiert 802.11 neben Daten-Frames auch Management-Frames, die der Verwaltung des Netzwerkes dienen.
 Diese werden jedoch, anders als Daten-Frames, weder authentifiziert noch verschlüsselt auf dem unsicheren Übertragungsmedium versendet.
 Das hat zur Folge, dass ein Angreifer eigene Management-Frames erstellen und im Netzwerk unter einem gefälschten Absender an beliebige Teilnehmer verteilen kann.
@@ -74,7 +74,7 @@ Nach dem Angriff stoppen wir die eingangs gestartete Netzwerkaufzeichung von \te
 Wurde die MAC-Adresse des Access-Points nicht beim Aufzeichnen des Verkehrs spezifiziert sollte sie nun mit dem Flag \texttt{-b} festgelegt werden.
 Andernfalls wird \texttt{Pyrit} für eventuell weitere aufgezeichnete Handshakes von anderen Netzwerken mit einer positive Rückmeldung antworten.
 
-\subsubsection{\enquote{Evil-Twin}-Angriff}
+\subsubsection{\enquote{Evil-Twin}-Angriff}\label{subs:evil-twin-attack}
 Ein Nachteil des Deauthentication-Angriffs ist, dass sowohl der Client als auch der Access-Point in Reichweite des Angreifers sein müssen (on-site) um den Handshake zwischen beiden abfangen zu können.
 Um den PSK eines WPA2-Netzwerks zu Bruteforcen ist jedoch kein vollständiger Handshake notwendig.
 Den Angreifer benötigt lediglich folgende Informationen:
