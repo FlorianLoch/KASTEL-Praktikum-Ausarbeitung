@@ -28,11 +28,34 @@ Gerade bei Deauthentification-Frames birgt die unverschlüsselte, unauthentifizi
 So kann ein in Reichweite befindlicher Angreifer eine erneute Authentifizierung des Clients forcieren und unter Einsatz moderater Sendeleistung Angriffe gegen die Netzwerkverfügbarkeit einzelner Stationen in der Funkzelle fahren ohne im Besitz des Geheimnisses zu sein. Die Thematik von \textit{Denial of Service}-Angriffen mit in der Spezifikation festgelegten Frame-Typen wird bspw. in \cite{bernaschi2008access} behandelt.
 
 \subsection{Der Handshake bei WPA2-PSK}\label{subs:handshake}
-TODO, hier muss noch was hin. Der Terminus des Handshakes sollte dabei fallen. Auch PTK, GTK und PMK sowie MIC. Sonst nächstes Kapitel nicht zu verstehen.
+WPA2 ist eine Implementierung des Sicherheitsstandards 802.11i der Authentifizierungs- und Verschlüsselungsmechanismen für die geschützte Datenübertragung in Wireless-Netzwerken definiert.
+WPA2 unterstützt zwei verschiedene Authentifizierungsmodi: 
+\begin{itemize}
+	\item Pre-Shared Key (PSK): Die Clients und der Access-Point teilen sich ein gemeinsame Geheimnis, dass für die Authentifizierung verwendet wird.
+	\item Enterprise: Die Clients authentifizieren sich über einen RADIUS-Server (zB. via Nutzername und Passwort). Die Anfragen werden vom Access-Point lediglich weitergeleitet.
+\end{itemize}
+Folgend werden wir uns auf die Authentifizierung mit WPA2-PSK fokussieren.
+Dafür wird ein sogenannter \enquote{4-Way-Handshake} zwischen dem Client (\enquote{Supplicant}) und dem Access-Point (\enquote{Authenticator}) durchgeführt.
+In diesem wird nicht nur der für die Kommunikation genutzte Sitzungsschlüssel ausgehandelt, sondern auch sichergestellt, dass Client und Access-Point den PSK kennen, ohne dass dieser übertragen werden muss.
 
+In einem vorbereitenden Schritt wird einmalig auf beiden Seiten der \enquote{Pairwise-Master-Key} (PMK) berechnet:
+\[PMK = PBKDF2(HMAC-SHA1, PSK, SSID, 4096, 256)\]
+Die Schlüsselableitungsfunktion PBKDF2  berechnet in 4096 Runden HMAC-SHA1 einen 256 Bit langen Schlüssel.
+Als Eingabe für den HMAC dienen der PSK als Schlüssel und die SSID als initiale Nachricht.
+Nach der Berechnung kann der Handshake durchgeführt werden.
+Im ersten Schritt zieht der Authenticator zufällig gleichverteilt\footnote{Die Noncen sollen Replay-Angriffe verhindern und werden daher zufällig gleichverteilt gezogen.} eine Zahl, die sogenannte \enquote{ANonce}, und sendet sie an den Client.
+Danach zieht der Supplicant eine eigene Zufallszahl, die sogenannte \enquote{SNonce}, und berechnet den Pairwise-Transient Key (PTK):
+\[PTK = PRF(PMK, Supp-MAC, Auth-MAC, SNonce, ANonce)\]
+Dafür werden der PMK, die Zufallszahlen und die MAC-Adressen beider Teilnehmer in einer Pseudozufallsfunktion (PRF) evaluiert.
+Abschließend bildet der Supplicant einen Message-Integrity-Code (MIC) über seinen PTK und sendet ihn zusammen mit der SNonce an den Authenticator.
+Der Authenticator besitzt nun alle Parameter um den PTK inklusive MIC zu berechnen.
+Stimmt der von ihm gebildete MIC mit dem vom Supplicant übertragenen MIC überein so muss der Supplicant das korrekte Passwort kennen\footnote{Da eine Hash-Funktion zur Schlüsselableitung verwendet wird können weitere Passwörter existieren, die zum selben MIC führen.}.
+In den letzten beiden Schritten werden lediglich die Schlüssel installiert und der Handshake abgeschlossen.
+
+Abbildung \ref{fig:wpa2handshake} zeigt noch einmal anschaulich die nötigen Schritte, die während des Handshakes durchgeführt werden.
 \begin{figure}[ht]
 	\centering
-etgf	\includegraphics[width=0.95\textwidth]{graphics/wpa2handshake}
+etgf	\includegraphics[width=0.80\textwidth]{graphics/wpa2handshake}
 	\caption[Deauthentication-Frame]{Abbildung aller vier Schritte des WPA2 Handshakes inklusive Berechnungen.}
 	\label{fig:wpa2handshake}
 \end{figure}
