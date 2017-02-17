@@ -133,7 +133,14 @@ Weiß der Angreifer im Vorfeld für welche SSID er den Evil-Twin öffnen möchte
 Durch das Flag \texttt{-Z 4} wird sich der Evil-Twin als AP eines WPA2-PSK geschützten Netzwerks ausgeben.
 Mithilfe von \texttt{-F <Dateiname>} wird der Netzwerkverkehr zwischen dem Evil-Twin und den Clients mitgeschnitten.
 Versucht sich ein Client nun mit dem Evil-Twin zu verbinden, so wird der Handshake bis zu Schritt zwei durchgeführt und anschließend abgebrochen.
-Dies äußert sich beim Client in Form einer Fehlermeldung wie zum Beispiel: \enquote{Fehler bei der Authentifizierung}. Auch dem mitgeschnittenen Handshake sieht man dies an  -- der obenstehende Aufruf von \texttt{pyrit} findet diesen zwar, markiert ihn jedoch als \enquote{Bad}, da er nicht erfolgreich durchgeführt wurde.\\
+Dies äußert sich beim Client in Form einer Fehlermeldung wie zum Beispiel: \enquote{Fehler bei der Authentifizierung}. \\
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.7\textwidth]{graphics/pyrit_analyze}
+	\caption[Pyrit]{Auch dem mitgeschnittenen Handshake sieht man an, dass es sich nur um einen \enquote{halben Handshake} handelt -- der obenstehende Aufruf von \texttt{pyrit} markiert ihn als \enquote{Bad}, da er nicht erfolgreich durchgeführt wurde. Für einen Angriff eignet er sich dennoch.}
+\end{figure}
+\FloatBarrier
 
 Kennt der Angreifer keine seinem Ziel bekannten SSIDs, so kann er das \texttt{-P}-Flag verwenden:
 \begin{Verbatim}
@@ -176,9 +183,8 @@ Sofern während der Aufzeichnung sichergestellt wurde, dass ausschließlich Verk
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.95\textwidth]{graphics/aircrack_success}
-	\caption[Aircrack-ng]{Aircrack-ng hat den gültigen PSK gefunden}
-	\label{fig:wpa2handshake}
+	\includegraphics[width=0.7\textwidth]{graphics/aircrack_success}
+	\caption[Aircrack-ng]{aircrack-ng hat den gültigen PSK gefunden}
 \end{figure}
 
 \FloatBarrier
