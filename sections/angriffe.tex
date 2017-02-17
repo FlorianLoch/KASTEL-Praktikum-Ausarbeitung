@@ -5,12 +5,17 @@ Tatsächlich gibt es nach dem bekannten Stand der Forschung keine Schwachstellen
 
 Aufgrund der Aufmerksamkeit, der sich dieses Thema unter Netzwerkexperten und Kryptologen in der Vergangenheit erfreute, ist nicht damit zu rechnen, dass in dem Verfahren noch grundlegende Schwachstellen gefunden werden. 
 
-Da die Sicherheit eines solches Verfahrens jedoch von mindestens drei Dingen abhängt -- der Sicherheit des Protokolls sowie der kryptografischen Primitiven, der fehlerfreien Implementierung und eben auch der Wahl eines guten Geheimnisses -- reicht dies allein nicht aus. So liegt die Wahl des Geheimnisses (in diesem Fall des Netzwerkschlüssels) meist in der Hand des nicht zwingend sachverständigen Endnutzers. So kann ein schlecht gewähltes Passwort oftmals durch einen durchdachten Wörterbuchangriff in realistischer Zeit gebrochen werden, ohne das Protokoll als solches angreifen zu müssen.\\
-%TODO: Stimmt wohl nicht, siehe https://dl.aircrack-ng.org/breakingwepandwpa.pdf Formulierung ist auch sehr gewagt, es kann immer was passieren ;) Das bezieht sich aber nicht auf WPA2 ;)
+Da die Sicherheit eines solches Verfahrens jedoch von mindestens drei Dingen abhängt -- der Sicherheit des Protokolls sowie der kryptografischen Primitiven, der fehlerfreien Implementierung und auch der Wahl eines guten Geheimnisses -- reicht dies allein nicht aus. 
+So liegt die Wahl des Geheimnisses (in diesem Fall des Netzwerkschlüssels) meist in der Hand des nicht zwingend sachverständigen Endnutzers. 
+So kann ein schlecht gewähltes Passwort oftmals durch einen durchdachten Wörterbuchangriff in realistischer Zeit gebrochen werden, ohne das Protokoll als solches angreifen zu müssen.\\
 
-Eine weitere Spielweise sind Social-Engineering-Angriffe, die auf die Unwissenheit, Unaufmerksamkeit und Leichtgläubigkeit des Nutzers setzen. Durch die nachfolgend beschriebene \enquote{Auskunftsfreudigkeit} der meisten Endgeräte hinsichtlich ihnen bekannten Netzwerken ergeben sich für Tools dieser Kategorie Möglichkeiten ihre Angriffe plausibel und für die meisten Nutzer authentisch wirkend durchzuführen.
-So zum Beispiel das Tool \textit{wifiphisher}\footnote{\textit{wifiphisher} strahlt über einen geeigneten Netzwerk-Adapter ein offenes Netzwerk mit beliebiger SSID aus und präsentiert sich verbindenden Nutzers je nach System verschiedene, teils Systemdialogen täuschend echt aussehende Dialoge zur Eingabe des Netzwerkschlüssels. Um einen Nutzer in das eigene Netzwerk zu bringen nutzt es die später beschriebene Methodik der Deauthentification-Frames. \textit{Fluxion}, ein ähnliches Tool, prüft die vom Benutzer getätigten Eingaben zusätzlich gegen einen mitgeschnittenen Handshake ab und kann sich so dem Benutzer gegenüber authentisch Verhalten und Falscheingaben erkennen.}. 
-Dieser und weitere praktisch durchführbare Angriffe, wie sie beispielsweise in~\cite{caneill2010attacks} beschrieben sind, sollen in dieser Ausarbeitung jedoch nicht weiter betrachtet werden, da ihr Ansatz ein grundlegend anderer ist.\\
+Eine weitere Spielwiese sind Social-Engineering-Angriffe, die auf Unwissenheit, Unaufmerksamkeit und Leichtgläubigkeit der Nutzer setzen. 
+Durch die nachfolgend beschriebene \enquote{Auskunftsfreudigkeit} der meisten Endgeräte hinsichtlich ihrer bekannten Netzwerken ergeben sich für Tools dieser Kategorie Möglichkeiten ihre Angriffe plausibel und für die meisten Nutzer authentisch wirkend durchzuführen.
+So strahlt zum Beispiel das Tool \textit{wifiphisher} über einen geeigneten Netzwerk-Adapter ein offenes Netzwerk mit beliebiger SSID aus und präsentiert sich verbundenen Nutzern je nach System verschiedene, teils täuschend echt aussehende Dialoge zur Eingabe des Netzwerkschlüssels. 
+Um einen Nutzer in das eigene Netzwerk zu bringen nutzt das Tool den später beschriebenen Deauth-Angriff. 
+
+\textit{Fluxion} prüft die vom Benutzer getätigten Eingaben zusätzlich gegen einen mitgeschnittenen Handshake ab und kann sich so dem Benutzer gegenüber authentisch Verhalten und Falscheingaben erkennen. 
+Dieser und weitere Angriffe, wie sie beispielsweise in~\cite{caneill2010attacks} beschrieben sind, sollen in dieser Ausarbeitung jedoch nicht weiter betrachtet werden, da ihr Ansatz ein grundlegend anderer ist.\\
 
 \subsection{Erfassen eines WPA2-Handshakes}
 Bei Bruteforce-Angriffen unterteilt sich die Ermittlung des Netzwerkschlüssels (PSK) in zwei elementare Schritte: 
@@ -24,7 +29,7 @@ Die vermutlich subtilste Methode zur Erlangung eines Handshakes, die dem Angreif
 Abhängig von der Netzwerkinfrastruktur und des Nutzungsverhaltens des Clients kann dies jedoch viel Zeit in Anspruch nehmen.
 Da dies für einen gezielten Angriff nicht zielführend erscheint werden nachfolgend zwei Angriffe beschrieben, die durch aktives Eingreifen in den Netzwerkverkehr die Authentifizierung des Clients forcieren.
 
-\subsubsection{Deauthentication-Angriff}\label{subs:deauthentication-attack}
+\subsubsection{Deauth-Angriff}\label{subs:deauthentication-attack}
 Wie in Kapitel~\ref{sec:grundlagen} bereits beschrieben definiert IEEE 802.11 neben Datenframes unter anderem auch Managementframes, die der Verwaltung des Netzwerkes dienen und weder verschlüsselt noch anderweitig authentifiziert auf dem exponierten Übertragungsmedium versendet werden.
 
 Dies hat zur Folge, dass ein Angreifer Managementframes erzeugen und im Netzwerk unter einem gefälschten Absender an beliebige Teilnehmer verteilen kann.
@@ -49,7 +54,7 @@ Abbildung~\ref{fig:deauth-attack} zeigt ein solches Deauthentication-Frame sowie
 Gemäß Spezifikation entspricht in Netzwerken, welche eine Authentifizierung erzwingen, eine Deauthentifizierung einer Disassozation (durch ein Disassociation-Frame herbeigeführte Verbindungsaufhebung)\footcite[S. 74, S. 442]{ieee802.11}. In einen einem Versuch gegen ein mit \textit{macOS 10.12.4} betriebenes Gerät konnten wir zeigen, dass -- auch wenn der Name es nicht suggeriert -- die Verwendung von Disassociation-Frames für diesen Angriff ebenfalls geeignet ist.
 
 \paragraph{Durchführung}
-Zur Durchführung des Deauthentication-Angriffs müssen zwei Bedingungen erfüllt sein: 
+Zur Durchführung des Deauth-Angriffs müssen zwei Bedingungen erfüllt sein: 
 \begin{itemize}
 	\item der Angreifer ist in Reichweite des Clients
 	\item der Client ist mit einem Access-Points des Zielnetzwerks verbunden 
@@ -62,9 +67,9 @@ Um potentielle Handshakes und andere Pakete aufzuzeichnen verwendet der Angreife
 \texttt{airodump-ng -c <Channel> --bssid <AP-MAC> -w <Dateiname> <Interface>}
 Das Flag \texttt{--bssid} ist dabei optional.
 Es verhindert, dass Pakete von anderen Access-Points aufgezeichnet werden und kann somit die nachträgliche Analyse erleichtern.
-Sind die MAC-Adresse des Clients und des Access-Points bekannt startet der Angreifer mit Hilfe von \texttt{aireplay-ng} den Deauthentication-Angriff: 
+Sind die MAC-Adresse des Clients und des Access-Points bekannt startet der Angreifer mit Hilfe von \texttt{aireplay-ng} den Deauth-Angriff: 
 \texttt{aireplay-ng -0 <Anzahl> -a <AP-MAC> -c <Client-MAC> <Interface>}
-Das Flag \texttt{-0} kennzeichnet den Deauthentication-Angriff.
+Das Flag \texttt{-0} kennzeichnet den Deauth-Angriff.
 Via \texttt{<Anzahl>} kann spezifiziert werden, wie viele Deauthentication-Frames an das Ziel gesendet werden.
 Ein Nachteil dieses Ansatzes ist, dass \texttt{aireplay-ng} mit dem Aussenden der Deauthentication-Frames wartet bis es einen Beacon-Frame des Access-Points erhalten hat.
 Alternativ kann die Deauthentifikation \enquote{manuell} mithilfe von \texttt{Scapy} durchgeführt werden:
@@ -75,7 +80,7 @@ Wurde die MAC-Adresse des Access-Points nicht beim Aufzeichnen des Verkehrs spez
 Andernfalls wird \texttt{Pyrit} für eventuell weitere aufgezeichnete Handshakes von anderen Netzwerken mit einer positive Rückmeldung antworten.
 
 \subsubsection{\enquote{Evil-Twin}-Angriff}\label{subs:evil-twin-attack}
-Ein Nachteil des Deauthentication-Angriffs ist, dass sowohl der Client als auch der Access-Point in Reichweite des Angreifers sein müssen (on-site) um den Handshake zwischen beiden abfangen zu können.
+Ein Nachteil des Deauth-Angriffs ist, dass sowohl der Client als auch der Access-Point in Reichweite des Angreifers sein müssen (on-site) um den Handshake zwischen beiden abfangen zu können.
 Um den PSK eines WPA2-Netzwerks zu Bruteforcen ist jedoch kein vollständiger Handshake notwendig.
 Den Angreifer benötigt lediglich folgende Informationen:
 \begin{itemize}
@@ -99,7 +104,7 @@ Die gesammelten Handshakes dienen als Grundlage für einen Angriff in die Breite
 
 \paragraph{Durchführung}
 Für den Evil-Twin Angriff bietet Aircrack-ng zwei mögliche Herangehensweisen, die folgend näher beleuchtet werden sollen.
-Zunächst muss, wie beim Deauthentication-Angriff bereits beschrieben, das Netzwerkinterface in den Monitor-Mode versetzt werden.
+Zunächst muss, wie beim Deauth-Angriff bereits beschrieben, das Netzwerkinterface in den Monitor-Mode versetzt werden.
 Weiß der Angreifer im Vorfeld für welche SSID er den Evil-Twin öffnen möchte, so kann er dafür den folgenden Befehl verwenden:
 \\\texttt{airbase-ng start --essid <SSID> -Z 4 -F <Dateiname> <interface>}\\
 Durch das Flag \texttt{-Z 4} wird sich der Evil-Twin als WPA2-PSK geschützter Access-Point ausgeben.

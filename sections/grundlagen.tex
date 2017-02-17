@@ -2,7 +2,11 @@
 IEEE 802.11 mitsamt all seinen Erweiterungen ist ein äußerst umfangreicher und komplexer Standard. Die für das Verständnis der vorliegenden Arbeit wesentlichen Punkte werden daher in vereinfachter Form in diesem Kapitel zusammengefasst. Für weiterführende Informationen sei auf entsprechende Literatur (bspw. \cite{rechWLAN}) bzw. den IEEE-Standard selbst verwiesen.
 
 \subsection{SSID, ESSID \& BSSID}
-IEEE 802.11 kennt verschiedene Netzwerktopologien; grundlegend bestehen diese aus einzelnen Funkzellen, den sogenannten \textit{Basic Service Sets} (\textit{BSS}). Eine solche BSS verfügt über einen einzigartigen \textit{Basic Service Set Identifier} (\textit{BSSID}), welche bei den üblichen Infrastruktur-Topologien der MAC-Adresse des WLAN-Interfaces des, die Funkzelle aufspannenden, \textit{Access Points} (\textit{AP}) entspricht \footcite[S. 51]{rechWLAN}. Besteht ein Netzwerk aus mehreren BSS-Zellen, so spricht man von einem \textit{Extended Service Set} welches über eine \textit{ESSID} verfügt. Diese entspricht üblicherweise dem \textit{Service Set Identifier} (\textit{SSID}) und wird in der Praxis meistens so bezeichnet. SSIDs können eine Länge von bis zu 32 Zeichen bzw. Byte annehmen.\cite{netgearESSID}
+IEEE 802.11 kennt verschiedene Netzwerktopologien; grundlegend bestehen diese aus einzelnen Funkzellen, den sogenannten \textit{Basic Service Sets} (\textit{BSS}). 
+Eine solche BSS verfügt über einen einzigartigen \textit{Basic Service Set Identifier} (\textit{BSSID}), welche bei den üblichen Infrastruktur-Topologien der MAC-Adresse des WLAN-Interfaces des, die Funkzelle aufspannenden, \textit{Access Points} (\textit{AP}) entspricht~\cite[S. 51]{rechWLAN}. 
+Besteht ein Netzwerk aus mehreren BSS-Zellen, so spricht man von einem \textit{Extended Service Set} welches über eine \textit{ESSID} verfügt. 
+Diese entspricht üblicherweise dem \textit{Service Set Identifier} (\textit{SSID}) und wird in der Praxis meistens so bezeichnet. 
+SSIDs können eine Länge von bis zu 32 Zeichen bzw. Byte annehmen~\cite{netgearESSID}.
 
 \subsection{Management-Frames}
 Neben den Datenframes zur Übertragung von Nutzdaten existieren im IEEE 802.11-Standard noch Kontroll- und Managementframes. Kontrollframes dienen dabei der Steuerung des Zugriffs auf das Übertragungsmedium, Managementframes zur Verwaltung der Funkzelle.\footcite[S. 180]{rechWLAN}
@@ -23,5 +27,5 @@ Der konkrete Grund wird dem Client durch einen sogenannten Reason-Code als Teil 
 Gerade bei Deauthentification-Frames birgt die unverschlüsselte, unauthentifizierte Übertragung ein Risiko.
 So kann ein in Reichweite befindlicher Angreifer eine erneute Authentifizierung des Clients forcieren und unter Einsatz moderater Sendeleistung Angriffe gegen die Netzwerkverfügbarkeit einzelner Stationen in der Funkzelle fahren ohne im Besitz des Geheimnisses zu sein. Die Thematik von \textit{Denial of Service}-Angriffen mit in der Spezifikation festgelegten Frame-Typen wird bspw. in \cite{bernaschi2008access} behandelt.
 
-\subsection{WPA2}
+\subsection{WPA2-Handshake}
 TODO, hier muss noch was hin. Der Terminis des Handshakes sollte dabei fallen. Auch PTK, GTP und PMK sowie MIC. Sonst nächstes Kapitel nicht zu verstehen.
