@@ -1,52 +1,52 @@
 \section{Angriffe}
-Im Rahmen dieser Ausarbeitung wollen wir uns auf die Ermittlung des gemeinsamen \textit{Pre-Shared Key} (folgend PSK) als Angriffsziel und auf den Angriffsvektor des Brechens des PSK durch Exploration des Schlüsselraumes beschränken. 
-Tatsächlich gibt es nach dem bekannten Stand der Forschung nur wenige Angriffe auf WPA2 PSK, die starke Vorannahmen über das Netzwerk und deren Teilnehmer treffen weswegen ihre Praxisrelevanz fragwürdig erscheint.
-%-- aufgrund der Aufmerksamkeit, der sich dieses Thema unter Netzwerkexperten und Kryptologen in der Vergangenheit erfreute, ist nicht damit zu rechnen, dass in dem Verfahren noch grundlegende Schwachstellen gefunden werden. 
-Ein schwach gewähltes Passwort hingegen kann oftmals durch einen durchdachten Wörterbuchangriff in realistischer Zeit gebrochen werden.
-%TODO: Stimmt wohl nicht, siehe https://dl.aircrack-ng.org/breakingwepandwpa.pdf Formulierung ist auch sehr gewagt, es kann immer was passieren ;)
+Im Rahmen dieser Ausarbeitung wollen wir uns auf die Ermittlung des \textit{Pre-shared Keys} (\textit{PSK}) als Angriffsziel und auf den Angriffsvektor des Brechens mitgeschnittener Handshakes durch Exploration des Schlüsselraumes (Bruteforce) beschränken.
 
-Durch die nachfolgend beschriebene "Auskunftsfreudigkeit" der meisten Endgeräte ergeben sich weitere Ansätze zur Ermittlung des PSK. 
-So zielt bspw. das Tool Fluxion\footnote{Fluxion ist ein Netzwerk-Tool welches seinen Benutzern erlaubt einen sog. Fake Access Point zu kreieren. Clients, die sich mit diesem Access Point verbinden, werden auf eine manipulierte Kopie der Login-Seite des originalen Access Points weitergeleitet und dazu verleitet, sich erneut mithilfe ihres PSK zu authentifizieren.} auf die Manipulierbarkeit des Nutzers ab~\cite{fluxion}. 
-Dieser und weitere praktisch durchführbare Angriffe, wie sie beispielsweise in~\cite{caneill2010attacks} beschrieben sind, sollen in dieser Ausarbeitung jedoch nicht weiter betrachtet werden.
+Tatsächlich gibt es nach dem bekannten Stand der Forschung keine Schwachstellen im Protokoll von WPA2-PSK, die es einem, nicht der Nutzergruppe angehörenden, Angreifer ermöglichen würden, die Kommunikation zu entschlüsseln. Es gibt bspw. eine Schwachstelle (\enquote{Hole 196}), die die Ermittlung des PTKs anderer Teilnehmer ermöglicht -- allerdings muss dem Angreifer hierfür der PSK bekannt sein, was die praktische Relevanz des Angriffes drastisch reduziert.
 
-Die Ermittlung des PSKs eines Netzwerkes unterteilt sich in zwei Schritte: 
-\begin{enumerate}
-	\item Die Erfassung eines WPA2-Handshakes zur Schlüsselaushandlung
-	\item Die nachgelagerte Suche nach einem Schlüssel, der zu einer Kollision führen würde
-\end{enumerate}
-%TODO: Finde die Formulierung von dir oben schon ausreichend, außerdem ist der Footnote Bereich sonst zu groß
-%\footnote{Theoretisch könnten auch mehrere potenzielle Schlüssel zu einer Hashkollision führen. Aufgrund der Längenbeschränkung von WPA2-Schlüsseln und der Güte der eingesetzten Hash-Verfahren ist dies jedoch äußerst unwahrscheinlich und in der Praxis nicht von Belang.}
+Aufgrund der Aufmerksamkeit, der sich dieses Thema unter Netzwerkexperten und Kryptologen in der Vergangenheit erfreute, ist nicht damit zu rechnen, dass in dem Verfahren noch grundlegende Schwachstellen gefunden werden. 
+
+Da die Sicherheit eines solches Verfahrens jedoch von mindestens drei Dingen abhängt -- der Sicherheit des Protokolls sowie der kryptografischen Primitiven, der fehlerfreien Implementierung und eben auch der Wahl eines guten Geheimnisses -- reicht dies allein nicht aus. So liegt die Wahl des Geheimnisses (in diesem Fall des Netzwerkschlüssels) meist in der Hand des nicht zwingend sachverständigen Endnutzers. So kann ein schlecht gewähltes Passwort oftmals durch einen durchdachten Wörterbuchangriff in realistischer Zeit gebrochen werden, ohne das Protokoll als solches angreifen zu müssen.\\
+%TODO: Stimmt wohl nicht, siehe https://dl.aircrack-ng.org/breakingwepandwpa.pdf Formulierung ist auch sehr gewagt, es kann immer was passieren ;) Das bezieht sich aber nicht auf WPA2 ;)
+
+Eine weitere Spielweise sind Social-Engineering-Angriffe, die auf die Unwissenheit, Unaufmerksamkeit und Leichtgläubigkeit des Nutzers setzen. Durch die nachfolgend beschriebene \enquote{Auskunftsfreudigkeit} der meisten Endgeräte hinsichtlich ihnen bekannten Netzwerken ergeben sich für Tools dieser Kategorie Möglichkeiten ihre Angriffe plausibel und für die meisten Nutzer authentisch wirkend durchzuführen.
+So zum Beispiel das Tool \textit{wifiphisher}\footnote{\textit{wifiphisher} strahlt über einen geeigneten Netzwerk-Adapter ein offenes Netzwerk mit beliebiger SSID aus und präsentiert sich verbindenden Nutzers je nach System verschiedene, teils Systemdialogen täuschend echt aussehende Dialoge zur Eingabe des Netzwerkschlüssels. Um einen Nutzer in das eigene Netzwerk zu bringen nutzt es die später beschriebene Methodik der Deauthentification-Frames. \textit{Fluxion}, ein ähnliches Tool, prüft die vom Benutzer getätigten Eingaben zusätzlich gegen einen mitgeschnittenen Handshake ab und kann sich so dem Benutzer gegenüber authentisch Verhalten und Falscheingaben erkennen.}. 
+Dieser und weitere praktisch durchführbare Angriffe, wie sie beispielsweise in~\cite{caneill2010attacks} beschrieben sind, sollen in dieser Ausarbeitung jedoch nicht weiter betrachtet werden, da ihr Ansatz ein grundlegend anderer ist.\\
 
 \subsection{Erfassen eines WPA2-Handshakes}
-Im Folgenden soll erläutert werden, welche Möglichkeiten ein Angreifer besitzt den für den Bruteforce-Angriff benötigten Handshake zu ermitteln. 
-Die wohl subtilste Methode, die dem Angriefer zur Verfügung steht, ist es den Netzwerkverkehr zu überwachen und zu warten, bis sich ein Client an einem Access Point im gewünschten Netzwerk authentifiziert. 
-Abhängig von der Netzwerkinfrastruktur und des Verhaltens der Clients kann dies jedoch viel Zeit in Anspruch nehmen.
-Folgend werden zwei mögliche Angriffe beschrieben, die durch aktives Eingreifen in den Netzwerkverkehr die Authentifikation der Clients forcieren soll.
+Bei Bruteforce-Angriffen unterteilt sich die Ermittlung des Netzwerkschlüssels (PSK) in zwei elementare Schritte: 
+\begin{enumerate}
+	\item Die Erfassung eines WPA2-PSK-Handshakes während der Authentifizierungsphase zwischen Client und AP
+	\item Die nachgelagerte Suche nach einem Schlüssel, der zu einem gleichen Hashwert führt
+\end{enumerate}
+%TODO: Finde die Formulierung von dir oben schon ausreichend, außerdem ist der Footnote Bereich sonst zu groß
+%\footnote{Theoretisch können auch mehrere Schlüsselkanditaten zu einer Hashkollision führen. Aufgrund der Längenbeschränkung von WPA2-Schlüsseln und der Güte der eingesetzten Hash-Verfahren hinsichtlich schwacher Kollisionsresistenz ist dies jedoch äußerst unwahrscheinlich und in der Praxis nicht von Belang.} 
+Die vermutlich subtilste Methode zur Erlangung eines Handshakes, die dem Angreifer zur Verfügung steht, ist die passive Überwachung des Netzwerkverkehrs und abzuwarten, bis sich ein Client gegenüber einem AP im gewünschten Netzwerk authentifiziert. 
+Abhängig von der Netzwerkinfrastruktur und des Nutzungsverhaltens des Clients kann dies jedoch viel Zeit in Anspruch nehmen.
+Da dies für einen gezielten Angriff nicht zielführend erscheint werden nachfolgend zwei Angriffe beschrieben, die durch aktives Eingreifen in den Netzwerkverkehr die Authentifizierung des Clients forcieren.
 
 \subsubsection{Deauthentication-Angriff}\label{subs:deauthentication-attack}
-Wie in Sektion~\ref{Grundlagen} bereits beschrieben definiert 802.11 neben Daten-Frames auch Management-Frames, die der Verwaltung des Netzwerkes dienen.
-Diese werden jedoch, anders als Daten-Frames, weder authentifiziert noch verschlüsselt auf dem unsicheren Übertragungsmedium versendet.
-Das hat zur Folge, dass ein Angreifer eigene Management-Frames erstellen und im Netzwerk unter einem gefälschten Absender an beliebige Teilnehmer verteilen kann.
-Zu dieser Klasse zählen unter anderem die sogenannten Deauthentication-Frames mit denen ein Access-Point oder ein Teilnehmer die Schlüsselneuaushandlung unter erneuter Durchführung eines Handshakes erzwingen kann.
-Ein Angreifer kann diese Frames für einen Deauthentication-Angriff verwenden um die darauf folgenden Handshakes abzufangen.
-Dafür erstellt er ein Deauthentication-Frame und setzt:
+Wie in Kapitel~\ref{sec:grundlagen} bereits beschrieben definiert IEEE 802.11 neben Datenframes unter anderem auch Managementframes, die der Verwaltung des Netzwerkes dienen und weder verschlüsselt noch anderweitig authentifiziert auf dem exponierten Übertragungsmedium versendet werden.
+
+Dies hat zur Folge, dass ein Angreifer Managementframes erzeugen und im Netzwerk unter einem gefälschten Absender an beliebige Teilnehmer verteilen kann.
+So auch Deauthentication-Frames, mit denen ein Access-Point die erneute Authentifizierung vor einer weiteren Nutzung erzwingen kann. Der Idee ist nun sehr simpel: Der Angreifer kennt sein Opfer, gaukelt diesem durch gefälschte\footnote{In unseren Versuchen hat sich gezeigt, dass es meistens mehrerer Deauthentication-Pakete bedurfte, um den Client tatsächlich zu einem kurzzeitigen Verlassen des Netzwerkes zu bewegen. Die Wahl der Anzahl hat sich hierbei als Gratwanderung herausgestellt: werden zu wenig Pakete versendet führt der Client keine erneute Authentifizierung durch -- werden jedoch zu viele Pakete versendet, so konnten wir beobachten wie das Endgerät sich mit einem eigentlich niedriger priorisiertem Netzwerk verbunden hat, da ihm einer erneuter Verbindungsaufbau anscheinend nicht möglich erschien. Ein Wert von 20 hat sich in unseren Versuchen als zielführend erwiesen.} Deauthentication-Frames die Deauthentifizierung durch den AP vor um anschließend den provozierten Handshake mitschneiden zu können.
+Die Felder des entsprechenden Deauthentication-Frame werden dabei wie folgt gesetzt:
 \begin{itemize}
-	\item als Zieladresse (DA) die MAC-Adresse des gewünschten Clients
+	\item als Zieladresse (DA) die MAC-Adresse des Clients
 	\item als Quelladresse (SA) die MAC-Adresse des Access-Points
-	\item als Basic Service Set Identifier (BSSID) die MAC-Adresse des Access-Points
-	\item einen selbst gewählten Reason Code in den Body
+	\item als BSSID die MAC-Adresse des AP mit dem der Client kommuniziert
+	\item ein beliebiger Reason-Code, bspw. \enquote{1} für \enquote{Unspecified Reason} \cite[S. 442]{ieee802.11}
 \end{itemize}
 Abbildung~\ref{fig:deauth-attack} zeigt ein solches Deauthentication-Frame sowie die vom Angreifer zu modifizierenden Felder.
-Alternativ kann der Client als Absender und der Access-Point als Adressat angegeben werden.
-Versendet der Angreifer nun das Deauthentication-Frame an den Client wird dieser, getäuscht durch den gefälschten Absender, die aktive Verbindung zum Access Point unterbrechen und eine Neuauthentifizierung durchführen wollen.
-Folglich wird ein neuer Handshake vom Client initiiert, der vom Angreifer mitgeschnitten werden kann.
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.95\textwidth]{graphics/deauth-attack}
-	\caption{Für einen Deauth-Angriff müssen lediglich die MAC-Adressen des Access-Points und des Clients bekannt.}
+	\caption[Deauthentication-Frame]{Für einen Deauth-Angriff müssen lediglich die MAC-Adressen des AP und des Clients bekannt sein.}
+	% TODO Wo stammt die Grafik her? Quelle
 	\label{fig:deauth-attack}
 \end{figure}
+
+Gemäß Spezifikation entspricht in Netzwerken, welche eine Authentifizierung erzwingen, eine Deauthentifizierung einer Disassozation (durch ein Disassociation-Frame herbeigeführte Verbindungsaufhebung)\footcite[S. 74, S. 442]{ieee802.11}. In einen einem Versuch gegen ein mit \textit{macOS 10.12.4} betriebenes Gerät konnten wir zeigen, dass -- auch wenn der Name es nicht suggeriert -- die Verwendung von Disassociation-Frames für diesen Angriff ebenfalls geeignet ist.
 
 \paragraph{Durchführung}
 Zur Durchführung des Deauthentication-Angriffs müssen zwei Bedingungen erfüllt sein: 
