@@ -27,12 +27,12 @@ Der konkrete Grund wird dem Client durch einen sogenannten \enquote{Reason-Code}
 Gerade bei Deauthentification-Frames birgt die unverschlüsselte, unauthentifizierte Übertragung ein Risiko.
 So kann ein in Reichweite befindlicher Angreifer eine erneute Authentifizierung des Clients forcieren und unter Einsatz moderater Sendeleistung Angriffe gegen die Netzwerkverfügbarkeit einzelner Stationen in der Funkzelle fahren ohne im Besitz des Geheimnisses zu sein. Die Thematik von \textit{Denial of Service}-Angriffen mit in der Spezifikation festgelegten Frame-Typen wird bspw. in \cite{bernaschi2008access} behandelt.
 
-\subsection{WPA2}
-TODO, hier muss noch was hin. Der Terminis des Handshakes sollte dabei fallen. Auch PTK, GTP und PMK sowie MIC. Sonst nächstes Kapitel nicht zu verstehen.
+\subsection{Der Handshake bei WPA2-PSK}\label{subs:handshake}
+TODO, hier muss noch was hin. Der Terminus des Handshakes sollte dabei fallen. Auch PTK, GTK und PMK sowie MIC. Sonst nächstes Kapitel nicht zu verstehen.
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.95\textwidth]{graphics/wpa2handshake}
+etgf	\includegraphics[width=0.95\textwidth]{graphics/wpa2handshake}
 	\caption[Deauthentication-Frame]{Abbildung aller vier Schritte des WPA2 Handshakes inklusive Berechnungen.}
 	\label{fig:wpa2handshake}
 \end{figure}
