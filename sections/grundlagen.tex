@@ -16,8 +16,8 @@ Diese drei Kategorien lassen sich weiter in einzelne Frame-Typen untergliedern. 
 \subsubsection{Beacon-Frames}
 Beacon-Frames werden von einem AP periodisch -- meist vielfach in einer Sekunde -- versendet, um das ausgestrahlte Netzwerk bzw. dessen Konfiguration für Stationen in Reichweite bekannt zu machen. Neben der SSID enthalten diese unter anderem den Kanal, auf dem der AP sendet, sowie die (Sicherheits-)Konfiguration (Übertragungsraten, verwendetes Sicherungsverfahren etc.). Im Fall von versteckten Netzwerken (\enquote{Hidden networks}) werden keine Beacon-Frames vom AP ausgesendet.
 
-\subsubsection{Probe-Request- und Probe-Response-Frames}
-Mit Hilfe von Probe-Requests ist es einem Client möglich von sich aus nach einem Netzwerk in Reichweite zu suchen, von dem er bereits die SSID kennt. Neben den möglichen Übertragungsraten enthält ein Probe-Request-Frame die hier wesentliche SSID des gesuchten Netzwerkes. Ein in Reichweite befindlicher AP, der dem über die SSID identifizierten Netzwerk zugeordnet ist antwortet daraufhin mit einem Probe-Reponse-Frame -- allerdings nur, wenn die angegeben Übertragungsraten mit dem Netzwerk kompatibel sind. Aus technischer Sicht ist die Verwendung nur im Falle versteckter Netzwerke erforderlich -- die von uns in der Praxis beobachtete Sendefrequenz der Beacon-Frames ist so hoch, dass es der gezielten Nachfrage seitens des Clients nicht bedarf. Diese Feststellung ist wichtig, da ein Endgerät hierdurch ihm bekannte Gegenstellen verrät. Dadurch wird das Endgerät identifizierbar sowie anfällig für den in \ref{subs:evil-twin-attack} vorgestellten \enquote{Evil-Twin}-Angriff.
+\subsubsection{Probe-Request- und Probe-Response-Frames}\label{subs:probes}
+Mit Hilfe von Probe-Requests ist es einem Client möglich von sich aus nach einem Netzwerk in Reichweite zu suchen, von dem er bereits die SSID kennt. Neben den möglichen Übertragungsraten enthält ein Probe-Request-Frame die hier wesentliche SSID des gesuchten Netzwerkes. Ein in Reichweite befindlicher AP, der dem über die SSID identifizierten Netzwerk zugeordnet ist antwortet daraufhin mit einem Probe-Reponse-Frame -- allerdings nur, wenn die angegeben Übertragungsraten mit dem Netzwerk kompatibel sind. Aus technischer Sicht ist die Verwendung nur im Falle versteckter Netzwerke erforderlich -- die von uns in der Praxis beobachtete Sendefrequenz der Beacon-Frames ist so hoch, dass es der gezielten Nachfrage seitens des Clients nicht bedarf. Diese Feststellung ist wichtig, da ein Endgerät hierdurch ihm bekannte Gegenstellen verrät. Dadurch wird das Endgerät identifizierbar sowie anfällig für den in \ref{subs:evil-twin-attack} vorgestellten \enquote{Evil-Twin}-Angriff. Das Praxis-Verhalten verschiedener Geräte haben wir analysiert; Abschnitt~\ref{subs:praxisprobes} beschreibt Versuch und Ergebnisse.
 
 \subsubsection{Deauthentification-Frames}\label{subs:deauthentication-frames}
 Deauthentication-Frames können vom AP (aber auch von (authentifizierten) Clients) versendet werden um eine Neuauthentifizierung des Clients beim AP anzufordern oder einfach einen bereits laufenden Authentifizierungsversuch abzubrechen. Gemäß der Spezifikation gibt es vielfältige Gründe (sie listet insgesamt 66 an Zahl) für das Versenden eines Deauthentification-Frames. bspw.: Inaktivität, ungültiger Schlüssel, MAC-Adresse des Clients bereits in Netz vorhanden oder durch Bewegen in eine andere Zelle des Netzwerkes und damit verbundener Wechsel des AP~\cite[S. 74, S. 442]{ieee802.11}.
@@ -55,8 +55,8 @@ In den letzten beiden Schritten werden lediglich die Schlüssel installiert und 
 Abbildung \ref{fig:wpa2handshake} zeigt noch einmal anschaulich die nötigen Schritte, die während des Handshakes durchgeführt werden.
 \begin{figure}[ht]
 	\centering
-etgf	\includegraphics[width=0.80\textwidth]{graphics/wpa2handshake}
-	\caption[Deauthentication-Frame]{Abbildung aller vier Schritte des WPA2 Handshakes inklusive Berechnungen.}
+	\includegraphics[width=0.80\textwidth]{graphics/wpa2handshake}
+	\caption[Deauthentication-Frame]{Abbildung aller vier Schritte des WPA2-Handshakes inklusive Berechnungen.}
 	\label{fig:wpa2handshake}
 \end{figure}
 
