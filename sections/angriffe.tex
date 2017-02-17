@@ -1,5 +1,5 @@
 \section{Angriffe}
-Im Rahmen dieser Ausarbeitung wollen wir uns auf die Ermittlung des \textit{Pre-shared Keys} (\textit{PSK}) als Angriffsziel und auf den Angriffsvektor des Brechens mitgeschnittener Handshakes durch Exploration des Schlüsselraumes (Bruteforce) beschränken.
+Im Rahmen dieser Ausarbeitung wollen wir uns auf die Ermittlung des \textit{Pre-shared Keys} (\textit{PSK}) als Angriffsziel und auf den Angriffsvektor des Brechens mitgeschnitttener Handshakes durch Exploration des Schlüsselraumes (Bruteforce) beschränken.
 
 Tatsächlich gibt es nach dem bekannten Stand der Forschung keine Schwachstellen im Protokoll von WPA2-PSK, die es einem, nicht der Nutzergruppe angehörenden, Angreifer ermöglichen würden, die Kommunikation zu entschlüsseln. Es gibt bspw. eine Schwachstelle (\enquote{Hole 196}), die die Ermittlung des PTKs anderer Teilnehmer ermöglicht -- allerdings muss dem Angreifer hierfür der PSK bekannt sein, was die praktische Relevanz des Angriffes drastisch reduziert.
 
@@ -9,7 +9,7 @@ Da die Sicherheit eines solches Verfahrens jedoch von mindestens drei Dingen abh
 So liegt die Wahl des Geheimnisses (in diesem Fall des Netzwerkschlüssels) meist in der Hand des nicht zwingend sachverständigen Endnutzers. 
 So kann ein schlecht gewähltes Passwort oftmals durch einen durchdachten Wörterbuchangriff in realistischer Zeit gebrochen werden, ohne das Protokoll als solches angreifen zu müssen.\\
 
-Eine weitere Spielwiese sind Social-Engineering-Angriffe, die auf Unwissenheit, Unaufmerksamkeit und Leichtgläubigkeit der Nutzer setzen. 
+Eine weitere Spielweise sind Social-Engineering-Angriffe, die auf Unwissenheit, Unaufmerksamkeit und Leichtgläubigkeit der Nutzer setzen. 
 Durch die nachfolgend beschriebene \enquote{Auskunftsfreudigkeit} der meisten Endgeräte hinsichtlich ihrer bekannten Netzwerken ergeben sich für Tools dieser Kategorie Möglichkeiten ihre Angriffe plausibel und für die meisten Nutzer authentisch wirkend durchzuführen.
 So strahlt zum Beispiel das Tool \textit{wifiphisher} über einen geeigneten Netzwerk-Adapter ein offenes Netzwerk mit beliebiger SSID aus und präsentiert sich verbundenen Nutzern je nach System verschiedene, teils täuschend echt aussehende Dialoge zur Eingabe des Netzwerkschlüssels. 
 Um einen Nutzer in das eigene Netzwerk zu bringen nutzt das Tool den später beschriebenen Deauth-Angriff. 
@@ -23,8 +23,6 @@ Bei Bruteforce-Angriffen unterteilt sich die Ermittlung des Netzwerkschlüssels 
 	\item Die Erfassung eines WPA2-PSK-Handshakes während der Authentifizierungsphase zwischen Client und AP
 	\item Die nachgelagerte Suche nach einem Schlüssel, der zu einem gleichen Hashwert führt
 \end{enumerate}
-%TODO: Finde die Formulierung von dir oben schon ausreichend, außerdem ist der Footnote Bereich sonst zu groß
-%\footnote{Theoretisch können auch mehrere Schlüsselkanditaten zu einer Hashkollision führen. Aufgrund der Längenbeschränkung von WPA2-Schlüsseln und der Güte der eingesetzten Hash-Verfahren hinsichtlich schwacher Kollisionsresistenz ist dies jedoch äußerst unwahrscheinlich und in der Praxis nicht von Belang.} 
 Die vermutlich subtilste Methode zur Erlangung eines Handshakes, die dem Angreifer zur Verfügung steht, ist die passive Überwachung des Netzwerkverkehrs und abzuwarten, bis sich ein Client gegenüber einem AP im gewünschten Netzwerk authentifiziert. 
 Abhängig von der Netzwerkinfrastruktur und des Nutzungsverhaltens des Clients kann dies jedoch viel Zeit in Anspruch nehmen.
 Da dies für einen gezielten Angriff nicht zielführend erscheint werden nachfolgend zwei Angriffe beschrieben, die durch aktives Eingreifen in den Netzwerkverkehr die Authentifizierung des Clients forcieren.
@@ -50,41 +48,64 @@ Abbildung~\ref{fig:deauth-attack} zeigt ein solches Deauthentication-Frame sowie
 	\label{fig:deauth-attack}
 \end{figure}
 
-Gemäß Spezifikation entspricht in Netzwerken, welche eine Authentifizierung erzwingen, eine Deauthentifizierung einer Disassozation (durch ein Disassociation-Frame herbeigeführte Verbindungsaufhebung)\footcite[S. 74, S. 442]{ieee802.11}. In einen einem Versuch gegen ein mit \textit{macOS 10.12.4} betriebenes Gerät konnten wir zeigen, dass -- auch wenn der Name es nicht suggeriert -- die Verwendung von Disassociation-Frames für diesen Angriff ebenfalls geeignet ist.
+Gemäß Spezifikation entspricht in Netzwerken, welche eine Authentifizierung erzwingen, eine Deauthentifizierung einer Disassozierung (durch ein Disassociation-Frame herbeigeführte Verbindungsaufhebung)\footcite[S. 74, S. 442]{ieee802.11}. In einen einem Versuch gegen ein mit \textit{macOS 10.12.4} betriebenes Gerät konnten wir zeigen, dass -- auch wenn der Name es nicht suggeriert -- die Verwendung von Disassociation-Frames für diesen Angriff ebenfalls geeignet ist.
 
 \paragraph{Durchführung}
-Zur Durchführung des Deauth-Angriffs müssen zwei Bedingungen erfüllt sein: 
+Zur Durchführung des Deauth-Angriffs müssen zwei Voraussetzungen erfüllt sein: 
 \begin{itemize}
-	\item der Angreifer ist in Reichweite des Clients
-	\item der Client ist mit einem Access-Points des Zielnetzwerks verbunden 
+	\item der Client ist mit einem AP des Zielnetzwerks verbunden; dieses operiert nach IEEE 802.11
+	\item der Angreifer befindet sich in Reichweite zu Client und dessen AP
 \end{itemize}
-Zunächst versetzt der Angreifer sein Netzwerkinterface (z.B. \texttt{wlan0}) in den Monitor-Mode und beendet störende Hintergrundprozesse:
-\texttt{airmon-ng check kill}\\
-\texttt{airmon-ng start <Interface>}\\
+
+Wie für alle in dieser Arbeit beschriebenen, praktischen Angriffe und Evaluationen wird ein WLAN-Chipset benötigt, dessen Treiber kompatibel mit der \textit{aircrack-ng}-Suite sind. 
+Zunächst versetzt der Angreifer sein Netzwerkinterface (z.B. \texttt{wlan0}) in den \enquote{Monitor-Mode}\footnote{Im Monitor-Modus verarbeitet das Interface alle eingehenden Pakete, nicht nur solche, die an die MAC-Adresse des Empfängers gerichtet sind oder als Broadcast verteilt werden.} und beendet interferierende Hintergrundprozesse:
+
+\begin{Verbatim}
+	airmon-ng check kill}
+	airmon-ng start <Interface im Monitor-Mode>
+\end{Verbatim}
+
 Dies ermöglicht das Überwachen des Netzwerkverkehrs und das aussenden eigens erstellter Frames.
 Um potentielle Handshakes und andere Pakete aufzuzeichnen verwendet der Angreifer \texttt{airodump-ng}:
-\texttt{airodump-ng -c <Channel> --bssid <AP-MAC> -w <Dateiname> <Interface>}
-Das Flag \texttt{--bssid} ist dabei optional.
-Es verhindert, dass Pakete von anderen Access-Points aufgezeichnet werden und kann somit die nachträgliche Analyse erleichtern.
-Sind die MAC-Adresse des Clients und des Access-Points bekannt startet der Angreifer mit Hilfe von \texttt{aireplay-ng} den Deauth-Angriff: 
-\texttt{aireplay-ng -0 <Anzahl> -a <AP-MAC> -c <Client-MAC> <Interface>}
-Das Flag \texttt{-0} kennzeichnet den Deauth-Angriff.
-Via \texttt{<Anzahl>} kann spezifiziert werden, wie viele Deauthentication-Frames an das Ziel gesendet werden.
-Ein Nachteil dieses Ansatzes ist, dass \texttt{aireplay-ng} mit dem Aussenden der Deauthentication-Frames wartet bis es einen Beacon-Frame des Access-Points erhalten hat.
-Alternativ kann die Deauthentifikation \enquote{manuell} mithilfe von \texttt{Scapy} durchgeführt werden:
-\texttt{Scapy Script hier}
-Nach dem Angriff stoppen wir die eingangs gestartete Netzwerkaufzeichung von \texttt{airodump-ng} und analysieren den Dump mithilfe eines geeigneten Tools, zum Beispiel \texttt{Pyrit}:
-\texttt{pyrit -r <Dump-Name> -b <AP-MAC> analyze}
-Wurde die MAC-Adresse des Access-Points nicht beim Aufzeichnen des Verkehrs spezifiziert sollte sie nun mit dem Flag \texttt{-b} festgelegt werden.
-Andernfalls wird \texttt{Pyrit} für eventuell weitere aufgezeichnete Handshakes von anderen Netzwerken mit einer positive Rückmeldung antworten.
+\begin{Verbatim}
+	airodump-ng -c <Ch> --bssid <AP-MAC> -w <Dateiname> <Interface>
+\end{Verbatim}
+Ist der Channel nicht bekannt, so kann \texttt{airodump-ng} auch \enquote{Channel-Hopping} betreiben. 
+Dies führt in der Praxis jedoch verständlicherweise zu Paketverlusten, weshalb es sich empfiehlt, den Channel vorher in Erfahrung zu bringen. Das Flag \texttt{--bssid} ist optional und dient als Filter. Es verhindert, dass Pakete von anderen APs aufgezeichnet werden und kann somit die nachträgliche Analyse erleichtern und die Datenmenge kleiner halten. Der Einsatz empfiehlt sich womöglich auch aus rechtlicher Perspektive.
+
+Sind die MAC-Adressen des Clients und des AP bekannt startet der Angreifer mit Hilfe von \texttt{aireplay-ng} den Deauth-Angriff: 
+\begin{Verbatim}
+	aireplay-ng -0 <Anzahl> -a <AP-MAC> -c <Client-MAC> <Interface>
+\end{Verbatim}
+\texttt{-0} kennzeichnet dabei den Deauth-Angriff.
+Via \texttt{<Anzahl>} kann spezifiziert werden, wie viele Deauthentication-Frames an das Ziel gesendet werden (bzgl. Anzahl siehe oben).
+Ein Nachteil dieses Ansatzes ist, dass \texttt{aireplay-ng} mit dem Aussenden der Deauthentication-Frames wartet bis es einen Beacon-Frame des Access-Points erhalten hat -- eine technische Notwendigkeit hierfür besteht unserer Ansicht nach nicht.
+Alternativ kann die Deauthentifikation mit wenigen Zeilen Python-Code unter Verwendung der Bibliothek \texttt{Scapy} durchgeführt erden.
+
+\begin{minted}[breakbytoken,breaklines]{python}
+	# Construct a deauth packet, subtype 12 
+	# is the 802.11 code for a deauthentication-frame
+	# bssid is equivalent to the MAC of the AP
+	p = scapy.RadioTap() / scapy.Dot11(type=0, subtype=12, addr1=clientMac, addr2=bssid,
+	addr3=bssid) / scapy.Dot11Deauth(reason=1)
+	scapy.send(p)
+\end{minted}
+
+Nach dem Angriff wird die eingangs gestartete Netzwerkaufzeichnung mit \texttt{airodump-ng} gestoppt, um den Dump mithilfe eines geeigneten Tools, zum Beispiel \texttt{Pyrit}, zu analysieren. Dieser Schritt ist optional, die schnelle Verifikation womöglich jedoch hilfreich\footnote{Wurde die MAC-Adresse des Access-Points nicht beim Aufzeichnen des Verkehrs spezifiziert sollte sie nun mit dem Flag \texttt{-b} festgelegt werden.
+Andernfalls wird \texttt{Pyrit} für eventuell weitere aufgezeichnete Handshakes von anderen Netzwerken positiv antworten.}:
+\begin{Verbatim}
+	pyrit -r <Dump-Name> -b <AP-MAC> analyze
+\end{Verbatim}
+Ein im Rahmen der Arbeit geschriebenes Python-Skript, welches unter Anderem die oben beschriebenen Schritte automatisiert, findet sich auf \textit{GitHub}\footnote{\href{https://github.com/kastel-wpa2/pyshark-scripts/blob/master/deauth_jammer.py}{https://github.com/kastel-wpa2/pyshark-scripts/blob/master/deauth\_jammer.py}}.
+Der Versuch des Brechens des erlangten Handshakes wird in Unterkapitel~\ref{subs:cracking} erläutert.
 
 \subsubsection{\enquote{Evil-Twin}-Angriff}\label{subs:evil-twin-attack}
-Ein Nachteil des Deauth-Angriffs ist, dass sowohl der Client als auch der Access-Point in Reichweite des Angreifers sein müssen (on-site) um den Handshake zwischen beiden abfangen zu können.
-Um den PSK eines WPA2-Netzwerks zu Bruteforcen ist jedoch kein vollständiger Handshake notwendig.
-Den Angreifer benötigt lediglich folgende Informationen:
+Ein Nachteil des Deauth-Angriffs ist, dass sowohl Client als auch AP in Reichweite des Angreifers sein müssen (\enquote{on-site}), um den Handshake zwischen beiden abfangen zu können. Der Evil-Twin-Angriff als \enquote{off-site}-Attacke hebt diese Beschränkung auf.\\
+
+Betrachtet man den Ablauf des Handshakes (siehe Unterkapitel~\ref{subs:handshake}), so stellt man fest, dass die für einen Bruteforce-Angriff wichtigen Elemente keines  vollständigen Handshake bedürfen. Benötigt werden lediglich folgende Informationen:
 \begin{itemize}
 	\item SSID des Netzwerkes 
-	\item MAC-Adressen der Handshaketeilnehmer
+	\item MAC-Adressen der beiden Kommunikationspartner
 	\item ANonce aus Schritt 1
 	\item SNonce inklusive MIC aus Schritt 2
 \end{itemize}
@@ -123,7 +144,7 @@ Wir empfehlen gleichzeitig einen \texttt{airodump-ng} Prozess zu starten, der de
 Dies hat den Hintergrund, dass die Aufzeichnung von \texttt{airbase-ng} ohne spezifizierte SSID via \texttt{--essid} Flag den Wert \texttt{default} als Netzwerknamen verwendet anstelle des Wertes aus der Probe-Requests.
 Ohne gültige SSID werden diese Handshakes jedoch unbrauchbar, da diese in die Berechnung des PMK mit einfließt.
 
-\subsection{Handshake Bruteforcing}
+\subsection{Handshake Bruteforcing}\label{subs:cracking}
 Nachdem die notwendigen Schritte des Handshakes erfolgreich abgefangen wurden kann der Angreifer den PSK offline brechen.
 Dafür spielt er die Schritte, die Client und Access-Point während dem Handshake durchführen, lokal nach und wählt dabei in jedem Versuch einen neuen Passwortkandidaten.
 Folgende Schritte sind dafür nötig:
