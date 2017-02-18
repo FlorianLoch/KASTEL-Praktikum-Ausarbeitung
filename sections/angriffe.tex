@@ -61,7 +61,7 @@ Wie für alle in dieser Arbeit beschriebenen, praktischen Angriffe und Evaluatio
 Zunächst versetzt der Angreifer sein Netzwerkinterface (z.B. \texttt{wlan0}) in den \enquote{Monitor-Mode}\footnote{Im Monitor-Modus verarbeitet das Interface alle eingehenden Pakete, nicht nur solche, die an die MAC-Adresse des Empfängers gerichtet sind oder als Broadcast verteilt werden.} und beendet interferierende Hintergrundprozesse:
 
 \begin{Verbatim}
-	airmon-ng check kill}
+	airmon-ng check kill
 	airmon-ng start <Interface im Monitor-Mode>
 \end{Verbatim}
 
