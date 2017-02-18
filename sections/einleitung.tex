@@ -1,22 +1,23 @@
 \section{Motivation \& Einleitung}
-Drahtlose Netzwerke, insbesondere IEEE 802.11, sind seit Jahren allgegenwärtig und werden in ihrer Bedeutung sicher noch weiter zunehmen. Egal ob in Büroräumen, Universitäten dem eigenen Wohnzimmer oder im Zug -- \enquote{WLAN} ist nicht wegzudenken aus unserer Welt der allgegenwärtigen Vernetzung. 
+Drahtlose Netzwerke, insbesondere IEEE 802.11, sind seit Jahren allgegenwärtig und werden in ihrer Bedeutung sicher noch weiter zunehmen. Egal ob in Büroräumen, Universitäten dem eigenen Wohnzimmer oder im Zug -- \enquote{WLAN} ist aus unserer Welt der allgegenwärtigen Vernetzung nicht wegzudenken. 
 So verfügen viele Endgeräte mittlerweile auch gar nicht mehr über Anschlüsse für kabelgebundene Netzwerke; ganze Klassen von Endgeräten wurden erst durch WiFi möglich bzw. nützlich: Smartphones, Tablets etc.\\
 
 Wohl niemand hat ernsthafte Bedenken, wenn er in drahtlosen Netzen kommuniziert -- ungeschützte, öffentliche Hotspots einmal ausgelassen. 
 Und dass, obwohl gerade diese Netze aus physikalischer Sicht besonders exponiert sind: die schlichte Nähe zum Zugangspunkt genügt, um aktiv in die Kommunikation einzugreifen.
 
 Durch entsprechenden Schutz auf Schicht zwei des ISO/OSI-Modells sollen Vertraulichkeit und Integrität aller darüberliegenden Protokolle transparent gewahrt werden.
-Nachdem mit \textit{WEP} ein nur unzureichendes Verfahren entwickelt und auf den Markt gebracht worden war diese Ziele umzusetzen, wurde mit \textit{WPA} eine Teilmenge der damals in Entwicklung befindlichen \textit{Robust Secure Network}-Spezifikation (\textit{RSN}) als vorübergehender Standard verabschiedet. 
-Seit 2004 ist der komplette RSN-Standard \textit{IEEE 802.11i} unter dem Namen \textit{WPA2} dabei, die alten Verfahren vollständig zu ersetzen.\\
+Nachdem mit \textit{Wired Equivalent Privacy} (\textit{WEP}) ein nur unzureichendes Verfahren entwickelt und auf den Markt gebracht worden, wurde mit \textit{Wi-Fi Protected Access} (\textit{WPA}) eine Teilmenge der damals in Entwicklung befindlichen \textit{Robust Secure Network}-Spezifikation (\textit{RSN}) als vorübergehender Standard verabschiedet. %TODO klang komisch, hab das mit den Zielen rausgenommen weil ichs nicht in den Satz gedrückt bekommen habe
+Seit 2004 ist der komplette RSN-Standard \textit{IEEE 802.11i} unter dem Namen \textit{WPA2} dabei, die alten Implementierungen vollständig zu ersetzen.\\
 
 Bezüglich der grundlegenden, theoretischen Sicherheit von \textit{WPA2(-PSK)} und den kryptographischen Primitiven gibt es in der Wissenschaft keinen Zweifel \footnote{2012 wurde das Verfahren nach 8 Jahren Einsatz in zusammenfassenden, wissenschaftlichen Arbeiten weiterhin als sicher angesehen \cite{kumkar2012}, seitdem sind keine nennenswerten Schwachstellen publik geworden.}. %TODO "HIER NOCH EIN PAPER" wirklich nötig? ist doch eins da in der footnote
-Diese Arbeit widmet sich daher der Frage, wie praxisrelevant Bruteforce-Angriffe als \enquote{letztes Mittel} gegen WPA2 sind und wie sie effizient funktionieren.
+Diese Arbeit widmet sich daher der Frage, wie praxisrelevant Bruteforce-Angriffe als \enquote{letztes Mittel} gegen den Schutz den WPA2 bietet sind und wie sie effizient funktionieren.
 Sollte man in der Praxis tatsächlich weiterhin auf eine sorglose Nutzung von 802.11i setzen oder birgt eine solche ernstzunehmende Risiken?\\
 
-Hierfür werden nötige Grundlagen hinsichtlich IEEE 802.11 eingeführt, anschließend werden verschiedene Angriffsansätze zur Erlangung eines WPA2-PSK-Handshakes sowie das (versuchte) Brechen desselben beschrieben. 
+Hierfür werden nötige Grundlagen hinsichtlich IEEE 802.11 eingeführt.
+Anschließend werden verschiedene Angriffsansätze zur Erlangung eines WPA2-PSK-Handshakes sowie das (versuchte) Brechen desselben beschrieben. 
 Dabei wird neben der konzeptionellen Herangehensweise auch die praktische Durchführung mit bewährten Tools aufgezeigt. 
 Wir schließen mit einer Zusammenfassung unserer Ergebnisse und einer Diskussion hinsichtlich der Praktikabilität der vorgestellten Angriffe.
 
-Auf \textit{WPA2-EAP}, welches statt eines \textit{Public Shared Keys} (\textit{PSK}) das \textit{Extended-Authentification-Protocol} (EAP) zur Authentifizierung verwendet, wird nicht weiter eingegangen werden.
+Auf \textit{WPA2-EAP}, welches statt eines \textit{Pre-Shared-Keys} (\textit{PSK}) das \textit{Extended-Authentification-Protocol} (EAP) zur Authentifizierung verwendet, wird nicht weiter eingegangen werden.
 
 Es sei an dieser Stelle ausdrücklich darauf hingewiesen, dass die Anwendung der beschriebenen Angriff gegen fremde Netzwerke -- sofern keine Erlaubnis hierfür erteilt wurde -- als Verstoß gegen §§ 202a, b, c des deutschen Strafgesetzbuches verstanden werden kann.
