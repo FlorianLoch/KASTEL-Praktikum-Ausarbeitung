@@ -1,31 +1,15 @@
-\section{Ausblick}
+\section{Zusammenfassung \& Ausblick}
 In dieser Ausarbeitung wurde gezeigt, wie ein Angreifer mit geringem Hardwareaufwand effizient WPA2-PSK Handshakes eines Zielnetzwerks oder Zielclients erhalten kann. 
-Diese können dann dazu verwendet werden um das geteilte Geheimnis des Netzwerkes, den PSK, offline zu erraten.
+Diese können im Anschluss dazu verwendet werden, um den Netzwerkschlüssel offline zu erraten.
 
-Befindet sich der Angreifer vor Ort, so kann der Deauthentication-Angriff genutzt werden um einen erneuten Handshake zwischen Access-Point und Client zu forcieren.
-In verwalteten Netzwerken, in denen Deauthentication-Frames zum Einsatz kommen, kann dieser Angriff durchgeführt werden ohne dass der Client die Möglichkeit hat eine valide Deauthentifizierung von einer gefälschten zu unterscheiden.
-Da keine Schutzmechanismen gegen den Deauthentication-Angriff existieren bedarf es der Erweiterung des Standards 802.11 um die Authentifizierung von Management-Frames. 
-Eine solche Erweiterung existiert in Form des Standards 802.11w~\cite{Ahmad:2011:SPS:1998412.1998424}, welcher jedoch nur auf wenigen Endgeräten und Access-Points Unterstützung findet.
+Da bislang keine Möglichkeit zur Unterscheidung eines gefälschten Deauthentication-Frames von einem validen besteht und auch sonst keine Schutzmechanismen gegen den Deauthentication-Angriff existieren bedarf es der Erweiterung des Standards 802.11 um die Authentifizierung von Management-Frames. 
+Eine solche Erweiterung existiert in Form des Standards 802.11w~\cite{Ahmad:2011:SPS:1998412.1998424}, welcher bisher jedoch nur auf wenigen Endgeräten und Access-Points Unterstützung findet.\\
 
-Alternativ kann der Angreifer mithilfe des Evil-Twin Angriffs ohne einen echten Access-Point in Reichweite den Client zum Handshake verleiten.
-Ein weiterer Vorteil dieses Verfahrens ist, dass gezielt für einen Client mehrere Handshakes für alle bekannten Netzwerke gesammelten werden können, solange er diese via Probe-Requests bekannt gibt.
-Um nun beispielsweise einen Man-in-the-Middle Angriff durchzuführen muss der Angreifer nicht etwa einen großen, komplexen Passwortraum explorieren, sondern lediglich das am schwächsten geschützte, dem Client bekannte Netzwerk finden.
-Ein Client kann sich schützen, indem er auf dem Endgerät die MAC-Adressen bekannter Access-Points speichert denen er vertraut. 
-Damit kann zumindest einem breitflächigen Off-Site Angriff entgegengewirkt werden, denn ist der Angreifer in Reichweite der vertrauten Access-Points kann er deren MAC-Adressen aus verschiedensten Frames extrahieren.
-In einem Netzwerk mit vielen Access-Points ist die Pflege dieser Einträge jedoch mühselig und zu zeitaufwändig für den Endnutzer.
-%TODO:Noch irgendwas von wegen Probe Requests sind unnötig
+Mit Hilfe des Evil-Twin Angriffs kann eine Angreifer ohne einen AP in Reichweite den Client durch Simulation eines solchen zu einem Handshake verleiten.
+Ein daraus folgender Vorteil dieses Verfahrens ist, dass gezielt für einen Client mehrere Handshakes für alle bekannten Netzwerke gesammelten werden können, solange er diese via Probe-Requests bekannt gibt.
+Um nun beispielsweise einen Man-in-the-Middle Angriff durchzuführen muss der Angreifer nicht etwa einen großen, komplexen Passwortraum explorieren, sondern lediglich das am schwächsten geschützte, dem Client bekannte Netzwerk finden. Die praktische Erprobung und zuverlässige Automatisierung dieses Ansatzes erscheint durchaus vielversprechend.
+Ein besserer Umgang mit dem Probe-Request-Response-Mechanismus könnte ihr sehr viel zusätzliche Sicherheit bringen, auch aus Sicht des Datenschutzes.\\
 
-Ist der aufgezeichnete Handshake gebrochen, so hat der Angreifer mit dem erratenen PSK Zugriff auf das interne Netzwerk. 
-Des weiteren lässt sich der komplette Nachrichtenverlauf, der seit dem Handshake aufgezeichnet wurde, nachträglich entschlüsseln.
-Dies gilt auch für zukünftigen Netzwerkverkehr anderer Clients unter der Voraussetzung, dass auch hier der Handshake mitgeschnitten wurde.
-Da der PSK bekannt und die übrigen Parameter öffentlich sind kann der PTK direkt berechnet werden.
-
-Beide vorgestellten Angriffe bauen jedoch auf der Annahme auf, dass Clients mit schwach geschützten Netzwerken verbunden sind und ein mitgeschnittener WPA2-PSK Handshake daher leicht zu brechen ist.
-Alternativ kann ein sicheres, zertifikatbasiertes Handshake-Verfahren verwendet werden, bei dem sowohl der Client als auch der Access-Point authentifiziert werden.
-Der nötige Einrichtungsaufwand spricht oft jedoch gegen die Nutzung eines solch aufwändigen Authentifizierungsmechanismus.
-Letztendlich liegt die Verantwortung zur Sicherung des WPA2-PSK Netzwerks in den Händen des Administrators, denn die Verwendung eines starken Passworts bleibt der einzig wirksame Schutz gegen Handshake-Bruteforcing. 
-
-
-%Hinweis, dass über Replay-Attacken mit getrennten Funkstrecken auch ohne Brechen des eigentlichen Handshakes eine Authentifizierung erfolgen kann, diese jedoch nichts nutzt, da die weitere Kommunikation mit PSK erfolgt (Ist das so? Wird kein neuer Schlüssel ausgehandelt?).
-%Was kann mit Schlüssel angestellt werden? Wieso sollte man ihn haben wollen? 
-%Wie kann ich den Payload einer Nachricht als Evil Twin mitlesen? 
+Beide vorgestellten Angriffe bauen auf der Annahme auf, dass Clients mit schwach geschützten Netzwerken verbunden sind und ein mitgeschnittener WPA2-PSK Handshake daher in realistischer Zeit zu brechen ist. Die Sicherheit von 802.11-Netzen grundlegend sicherstellen könnte die Verwendung eines sicheren, zertifikatbasierten Handshake-Verfahren, bei dem sowohl der Client als auch der AP authentifiziert werden.
+Der nötige Einrichtungsaufwand und Kostenfaktor, u. A. durch den Bedarf der Signierung der Zertifikate, spricht jedoch oft gegen die Nutzung eines solchen Authentifizierungsmechanismus.
+Letztendlich liegt die Verantwortung zur Sicherung des WPA2-PSK Netzwerks in den Händen des Administrators, denn die Verwendung eines starken Passworts bleibt der einzig wirksame Schutz gegen Handshake-Bruteforcing bei WPA2-PSK. 
