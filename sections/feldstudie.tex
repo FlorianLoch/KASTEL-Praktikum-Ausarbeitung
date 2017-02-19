@@ -40,26 +40,24 @@ Daher ist die Vorbereitung eines Evil-Twin Angriffs als absolut praktikabel einz
 Nachdem festgestellt worden ist, dass mit wenig Aufwand bekannte SSIDs anhand von Probe-Requests ermittelt werden können, sollte geprüft werden, ob die genannten Geräte eventuelle Schutzmechanismen gegen Evil-Twin Angriffe implementieren.\\
 
 Der Testaufbau bestand darin, auf allen oben genannten Endgeräten das WPA2-PSK geschützte Netzwerk mit der SSID \enquote{Tor-zum-Internet} bekannt zu machen, bzw. die Zugangsdaten zu hinterlegen.
-Anschließend wurde ein passender Evil-Twin mit dieser SSID via \texttt{airbase-ng} gestartet. Der eigentliche AP von \enquote{Tor-zum-Internet} wurde ausgeschaltet und das Off-Site-Szenario zu erreichen.
+Anschließend wurde ein passender Evil-Twin mit dieser SSID via \texttt{airbase-ng} gestartet. Es erfolgte dabei keine Konfiguration, die das Internet tatsächlich über den gefälschten AP erreichbar gemacht hätte. Dieser Schritt wäre erst sinnvoll, wenn der PSK bekannt wäre und ein MITM-Angriff durchgeführt werden sollte. Der eigentliche AP von \enquote{Tor-zum-Internet} wurde ausgeschaltet und das Off-Site-Szenario zu erreichen.
 Die Endgeräte wurden während der Durchführung des Angriffs nicht bedient und waren nicht in Reichweite anderer bekannter Netzwerke.
 
-An dieser Stelle ist es wichtig wiederholt zu erwähnen, dass der Handshake (siehe~\ref{subs:handshake}) im Schritt 3 durch den Evil-Twin abgebrochen wird.
-Daraus resultiert unter anderem das unterschiedliche Verhalten der einzelnen Android-Endgeräte trotz gleicher Betriebssystemversion.
-So zeichnete sich das Samsung Galaxy S6 Edge durch ein aggressives Authentifizierungsverhalten aus: Mit einer Rate von ca. zwei Authentifizierungen pro Sekunde stoch dieses Endgerät besonders heraus.
-Da es sich immer mit dem stärksten verfügbaren Netzwerk verbunden hat, hatte das Smartphone keinen Internetzugang mehr (z.B. über mobiles Datenvolumen).
-In diesem Fall konnte der Evil-Twin also für einen Denial-of-Service Angriff missbraucht werden.
-Die übrigen Endgeräte haben nach zwei bis vier gescheiterten automatischen Authentifizierungen aufgegeben und sind auf die Nutzung von mobilem Internet zurückgefallen.
-Dieses Verhalten trat jedoch periodisch in Zeitabständen von 30 bis 60 Sekunden auf.
-Die einzige Ausnahme bildeten hier die Laptops die ohne Nutzeraktion keine weiteren Handshakes initiiert haben.
+An dieser Stelle ist es wichtig wiederholt zu erwähnen, dass der Handshake (siehe~\ref{subs:handshake}) im Schritt 3 durch den Evil-Twin abgebrochen wird -- es nicht zu einer bestehenden Verbindung kommt.
+So zeichneten sich die Samsung-Geräte durch ein aggressives Assoziierungsverhalten aus: Mit einer Rate von ca. zwei Authentifizierungen pro Sekunde stach dieses Endgerät besonders heraus.
+Wurde ein weiteres Netzwerk bekannt gemacht, dessen AP räumlich jedoch deutlich aufgestellt war, so konnte sogar beobachtet werden, wie das Endgerät von dem, mit dem Internet verbundenen, AP zum stärker sendendem, jedoch nicht mit dem Internet verbundenen, AP zu wechseln versuchte. 
+In diesem Fall konnte der Evil-Twin für einen Denial-of-Service Angriff missbraucht werden -- der Anwender wäre ohne es zu merken nicht mehr online, auch da das Gerät eine mögliche und prinzipiell aktivierte LTE-Verbindung als Rückgriff nicht nutze.
 
-Sind bekannte Alternativnetzwerke in Reichweite, so bevorzugen die meisten Endgeräte das stärkste Netzwerk und wechseln wenn nötig den Access-Point.
-Wir konnten dieses Verhalten bei allen Endgeräten Ausnutzen, um Endgeräte zur Authentifikation mit dem Evil-Twin zu verleiten.
-Nach dem gescheiterten Handshake sind sie jedoch wieder zum Alternativnetzwerk gewechselt.
+Die übrigen Smartphones haben nach zwei bis vier gescheiterten automatischen Authentifizierungen aufgegeben und sind auf die Nutzung von mobilem Internet zurückgefallen.
+Dieses Verhalten wiederholte sich jedoch periodisch in Zeitabständen von 30 bis 60 Sekunden.\\
 
-Ist der Typ des Netzwerks vorher nicht bekannt kann der Angreifer, wie in der Durchführung erwähnt, mehrere Evil-Twins auf dem Netzwerkinterface öffnen.
+Es hat sich der Eindruck manifestiert, dass wenn mehrere bekannte Netzwerke in Reichweite sind, die meisten Endgeräte das stärkste Netzwerk auswählen -- nicht nur bei einem initialen Verbindungsaufbau sondern auch bei bereits bestehender Verbindung. Dies erleichtert einen Evil-Twin Angriff, da sich keine zusätzliche Bedingung aus dem aktuellen Status des Opfers ergibt.
+Wir konnten dieses Verhalten bei allen Endgeräten Ausnutzen, um sie zur Authentifikation mit dem Evil-Twin zu verleiten.
+
+Ist der Typ des Netzwerks vorher nicht bekannt kann der Angreifer, wie bereits erwähnt, mehrere Evil-Twins auf dem Netzwerkinterface öffnen.
 Alle getesteten Endgeräte haben sich in diesem Fall mit dem Access-Point mit der passenden Sicherheitskonfiguration verbunden.
-Wurde absichtlich die falsche Konfiguration gewählt, so haben dies lediglich das Windows 8.1 Phone und der Windows 10 Laptop erkannt und den Nutzer entsprechend gewarnt. %TODO Bild hier
-Die übrigen Endgeräte haben sich somit in einem offenen Evil-Twin ohne jegliche Verschlüsselung locken lassen, womit einem Man-in-the-Middle Angriff Tür und Tor geöffnet wird.
+Wurde absichtlich eine falsche Konfiguration angeboten, so haben dies lediglich das Windows Phone sowie der Windows 10 betriebene Laptop erkannt und den Nutzer entsprechend gewarnt. %TODO Bild hier
+Erstaunlicherweise haben die übrigen Endgeräte sich in einen offenen Evil-Twin ohne jegliche Verschlüsselung locken lassen, womit einem Man-in-the-Middle Angriff Tür und Tor geöffnet wird. Hierdurch entfällt jedwede, eigentlich geforderte implizite Authentifizierung des AP durch Kenntnis des PSK zur Durchführung der Kommunikation.\\
 
 Zusammenfassend ist der Evil-Twin als ein wenig subtiler, jedoch hochflexibler Angriff zu bewerten.
 Jedes der geprüften Endgeräte sendet die notwendigen SSIDs aus was den Angriff auf ein konkretes Netzwerk aber auch den Angriff auf einen konkreten Client leicht gestaltet.
