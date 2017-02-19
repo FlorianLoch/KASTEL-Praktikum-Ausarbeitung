@@ -9,10 +9,6 @@ Den folgenden Fragen wurde nachgegangen:
 	\item Können Deauth-Angriffe im eigenen Netzwerk erkannt werden bzw. von regulärem Netzwerkverkehr unterschieden werden?
 \end{itemize}
 
-\subsection{Probing-Verhalten von Endgeräten}\label{subs:praxisprobes}
-Um einen Evil-Twin Angriff (effizient) zu ermöglichen benötigt der Angreifer eine oder mehrere SSIDs von Netzwerken, die dem anzugreifenden Endgerät bekannt sind.
-Hierfür werden Probe-Requests zu Hilfe gezogen, die Endgeräte periodisch aussenden um bekannte Netzwerke zu detektieren.
-Dies variiert jedoch hinsichtlich Frequenz und Umfang, ist also abhängig vom Endgerät.
 Es wurden verschiedene, zur Verfügung stehende Smartphones und Notebooks unterschiedlicher Hersteller auf ihr Verhalten geprüft:
 \begin{itemize}
 	\item Nokia Lumia 530 (Windows Phone 8.1)
@@ -20,6 +16,54 @@ Es wurden verschiedene, zur Verfügung stehende Smartphones und Notebooks unters
 	\item Lenovo Thinkpad T550 (Windows 10)
 	\item Apple MacBook Pro 15 (Mid 2015), Apple MacBook Pro 13 (Mid 2014) (macOS 10.12)
 \end{itemize}
+
+\subsection{Detektion von Deauth-Angriffen}
+Zwar hängt die Durchführbarkeit eines Deauth-Angriffes nicht von seiner Nachweisbarkeit ab -- der Nutzen womöglich schon. Ist der Angriff offensichtlich und bspw. von einem (besseren) Router sicher detektierbar, so wird ein mitgeschnittenes Passwort u. U. sehr schnell durch ein neues ersetzt.
+Da keines der getesteten Endgeräte Schutzmechanismen gegenüber dem Deauthentication-Angriff aufweist, verzichten wir auf eine ausführliche Beschreibung und fokussieren uns auf dessen Erkennung auf Netzwerkebene. Allerdings wäre die Erkennung auf dem attackierten Gerät selbst am sinnvollsten, denn ein Angreifer könnte in einem aufwendigeren seine Position zum Senden der Deauthentification-Frames\footnote{Wie in~\ref{subs:deauthentication-attack} erwähnt eignen sich auch Disassociation-Frames für die Durchführung dieses Angriffs}so wählen, dass der 
+Dafür wurde in dieser Feldstudie der Netzwerkverkehr in zwei verschiedenen Szenarien aufgezeichnet:
+\begin{enumerate}
+	\item \textbf{WPA2-PSK Heimnetzwerk} mit einem Access-Point und 8 Teilnehmern, die sich selten aus der Reichweite des Access-Points entfernen
+	\item \textbf{WPA2-Enterprise Firmennetzwerk} mit 3 Access-Points und ca. 30 Teilnehmern, die sich häufig zwischen den einzelnen Access-Points bewegen
+\end{enumerate}
+Wir gehen davon aus, dass das Management des Firmennetzwerks, also unter anderem das Aussenden von Deauthentication-Frames, unabhängig vom konkreten WPA2-Authentifizierungsverfahren ist.
+Daher ist anzunehmen, dass sich ein WPA2-Enterprise geschütztes Netzwerk ähnlich verhält wie ein WPA2-PSK geschütztes.
+Aus den Merkmalen des Verkehrs, wie beispielsweise Typ, Häufigkeit und Inhalt der Deauthentication-Frames, können wir Eigenschaften ableiten mit denen wir den Deauthentication-Angriff bezüglich seiner Praxistauglichkeit bewerten können.
+
+Im Heimnetzwerk konnte selbst nach 24 Stunden des Aufzeichnens kein Deauthentication-Frame beobachtet werden.
+Unsere Erklärung dafür ist, dass in einem Heimnetzwerk mit einem einzigen Access-Point keine Notwendigkeit für das Umverteilen von Clients besteht.
+Weiterhin erfolgen Neuauthentifizierung durch Neustart der Endgeräte bzw. durch ausreichende Entfernung vom Access-Point und muss daher nicht forciert werden.
+Folglich ist ein Deauthentication-Angriff hier auch mit wenigen gesendet Frames äußerst auffällig und mit entsprechender Hardware leicht zu erkennen.
+
+Im Firmennetzwerk hingegen wurden im Schnitt 2,2 Deauthentication-Frames pro Minute detektiert.
+Hierbei sind ausschließlich folgende Reason-Codes aufgetreten:
+\begin{itemize}
+	\item 1: Unspecified reason $\rightarrow$ kein genauer Grund angegeben
+	\item 2: Previous authentication no longer valid $\rightarrow$ der Schlüssel des verbundenen Clients soll zugunsten der Vertraulichkeit neu ausgehandelt werden
+	\item 6: Class 2 frame received from nonauthenticated STA $\rightarrow$ der Client hat versucht vor der Authentifizierung Daten zu übertragen
+	\item 8: Disassociated because sending STA is leaving (or has left) BSS $\rightarrow$ das Management-System hat entschieden den Client einer anderen Station zuzuordnen (Load-Balancing)
+\end{itemize}
+Auffällig war ebenfalls, dass die Access-Points bis zu 5 Deauthentication-Frames gleichzeitig in einem Burst gezielt an einen Client versendet haben.
+Dieses Verhalten kann dem Angreifer dabei helfen seinen Angriff zu verschleiern.
+So kann er zum Beispiel den Netzwerkverkehr für kurze Zeit analysieren um zu erkennen, mit welcher Frequenz und mit welchen Reason-Codes die Frames von den Access-Points im Zielnetzwerk versendet werden.
+In einem Firmennetzwerk ist somit der Deauthentication-Angriff als praktikabel und auch subtil zu bewerten wenn der Angreifer die nötige Zeit aufwendet um seinen Angriff entsprechend den Gegebenheiten anzupassen.
+
+Der Deauthentication-Angriff ist für den Client selbst kaum nachvollziehbar: es kommt lediglich zu einem kurzen Aussetzer in der Verbindung zum Access-Point, da die Neuauthentifizierung binnen weniger 100 Millisekunden abläuft.
+Geht man davon aus, dass der Nutzer das Smartphone im Moment der Deauthentifikation benutzt, so ist der entstehende Verbindungsabbruch für ihn in der Statusleiste erkennbar.
+Der Angreifer kann dies jedoch vermeiden indem er auf ein Zeitfenster wartet, in dem keine Datenpakete zwischen dem Access-Point und dem Client ausgetauscht werden.
+Hier kann er davon ausgehen, dass der Client das Endgerät momentan nicht bedient und eventuell gesperrt hat.
+
+Abschließend ist zu sagen, dass selbst die Erkennung eines Deauthentication-Angriffs nicht davor schützt, dass der Angreifer die Handshakes abfängt und bricht.
+Der Netzwerkadministrator müsste nach einem offensichtlichen Angriff den PSK neu festlegen und an alle Clients verteilen.
+Da diese Prozedur zu aufwändig ist, sollte durch ein ausreichend sicheres Passwort der Prozess des Handhshake-Bruteforcings nahezu unmöglich gemacht werden.
+
+
+%Sollte nur relativ kurz werden, also welche Szenarien haben wir betrachtet (Heimnetzwerke, Bahnhof mit öffentlichen Netzwerken, AP in Firmennetzwerk) und wie oft/üblich sind deauths (im Heimnetzwerken von Haus mit 7 APs kein einziges deauth Paket in c.a. 24h, Firmennetzwerk mit c.a. 30 Teilnehmern in Reichweite des Accesspoints: rund 2,2 deauth Pakete pro Minute, reason codes variieren)
+
+
+\subsection{Probing-Verhalten von Endgeräten}\label{subs:praxisprobes}
+Um einen Evil-Twin Angriff (effizient) zu ermöglichen benötigt der Angreifer eine oder mehrere SSIDs von Netzwerken, die dem anzugreifenden Endgerät bekannt sind.
+Hierfür werden Probe-Requests zu Hilfe gezogen, die Endgeräte periodisch aussenden um bekannte Netzwerke zu detektieren.
+Dies variiert jedoch hinsichtlich Frequenz und Umfang, ist also abhängig vom Endgerät.
 Alle Geräten wurden mit der zum jeweiligen Zeitpunkt aktuellsten verfügbaren Betriebssystemversion getestet. Unsere Versuche sollen nicht als Basis für einen Vergleich der verschiedenen Plattformen gesehen werden -- sie sollen allgemeine Schwachstellen qualitativ überprüfen, sie nicht quantitativ in Relation setzen. Dementsprechend wurden die Listen der, den einzelnen Geräten jeweils bekannten, Netzwerke nicht gezielt angeglichen. Der Netzwerkverkehr wurde mithilfe von \texttt{airodump-ng} aufgezeichnet und nachträglich mit eigens entwickelten Python-Skripten unter Verwendung der \texttt{Pyshark}-Bibliothek analysiert und ausgewertet.\\
 
 Das mit Windows 8.1 betrieben Nokia sowie die getesteten Smartphones unter Android 6 wiesen einen ähnlichen Probing-Verlauf auf; in der Spitze konnten bis zu 40 Anfragen pro Minute beobachtet werden.
@@ -59,13 +103,10 @@ Alle getesteten Endgeräte haben sich in diesem Fall mit dem Access-Point mit de
 Wurde absichtlich eine falsche Konfiguration angeboten, so haben dies lediglich das Windows Phone sowie der Windows 10 betriebene Laptop erkannt und den Nutzer entsprechend gewarnt. %TODO Bild hier
 Erstaunlicherweise haben die übrigen Endgeräte sich in einen offenen Evil-Twin ohne jegliche Verschlüsselung locken lassen, womit einem Man-in-the-Middle Angriff Tür und Tor geöffnet wird. Hierdurch entfällt jedwede, eigentlich geforderte implizite Authentifizierung des AP durch Kenntnis des PSK zur Durchführung der Kommunikation.\\
 
-Zusammenfassend ist der Evil-Twin als ein wenig subtiler, jedoch hochflexibler Angriff zu bewerten.
-Jedes der geprüften Endgeräte sendet die notwendigen SSIDs aus was den Angriff auf ein konkretes Netzwerk aber auch den Angriff auf einen konkreten Client leicht gestaltet.
-Weiterhin ist der Evil-Twin der einzige Angriff der Off-site eingesetzt werden kann. 
-Somit ist kein realer Access-Point für das Erhalten des teilweisen Handshakes nötig.
+Zusammenfassend ist der Evil-Twin als ein -- wenn auch wenig subtiler -- hochflexibler Angriff zu bewerten. Er kann Off-Site eingesetzt werden, der reale AP ist für den Angriff nicht von Nöten.
 Eigenen Tests nach harmoniert der Evil-Twin Angriff sehr gut mit dem Deauthentication-Angriff.
 So kann ein bereits mit einem anderen Netzwerk verbundener Client so lange deauthentifiziert werden, bis er sich mit dem Evil-Twin verbindet.
-Der einzige Nachteil bleibt jedoch, dass der Evil-Twin im Netzwerk für alle sichtbar ist und somit leicht erkannt werden kann.
+Einziger Nachteil bleibt, dass der Evil-Twin in der Umgebung für alle sichtbar ist und somit leicht erkannt werden kann -- dies lässt sich jedoch durch ein \enquote{gezieltes Broadcasting} von Beacon-Frames oder dem Einsatz des Probe-Request-Response Schema von versteckten Netzwerken abschwächen.
 
 %(geht ein wenig einher mit dem Aussenden bekannter SSIDs, aber nicht unbedingt, da ich den Evil Twin Angriff auch auf Stationen anwenden kann, die gerade mit einem AP verbunden sind)
 %Nicht alle Endgeräte connecten automatisch mit dem Evil Twin
@@ -73,44 +114,3 @@ Der einzige Nachteil bleibt jedoch, dass der Evil-Twin im Netzwerk für alle sic
 
 %Des weiteren verwenden Apple-Geräte MAC-Randomization um ihre eindeutige Identität zu verschleiern und gezielte Angriffe gegen sie zu erschweren.
 %Dieser Mechanismus hat jedoch keine Auswirkung a
-
-\subsection{Deauthentication-Verhalten von APs}
-Da keines der getesteten Endgeräte Schutzmechanismen gegenüber dem Deauthentication-Angriff aufgezeigt hat verzichten wir auf eine ausführliche Beschreibung und fokussieren uns auf die Erkennung des Angriffs und auf seine Subtilität.
-Dafür wurde in dieser Feldstudie der Netzwerkverkehr in zwei verschiedenen Szenarien aufgezeichnet:
-\begin{enumerate}
-	\item \textbf{WPA2-PSK Heimnetzwerk} mit einem Access-Point und 8 Teilnehmern, die sich selten aus der Reichweite des Access-Points entfernen
-	\item \textbf{WPA2-Enterprise Firmennetzwerk} mit 3 Access-Points und ca. 30 Teilnehmern, die sich häufig zwischen den einzelnen Access-Points bewegen
-\end{enumerate}
-Wir gehen davon aus, dass das Management des Firmennetzwerks, also unter anderem das Aussenden von Deauthentication-Frames, unabhängig vom konkreten WPA2-Authentifizierungsverfahren ist.
-Daher ist anzunehmen, dass sich ein WPA2-Enterprise geschütztes Netzwerk ähnlich verhält wie ein WPA2-PSK geschütztes.
-Aus den Merkmalen des Verkehrs, wie beispielsweise Typ, Häufigkeit und Inhalt der Deauthentication-Frames, können wir Eigenschaften ableiten mit denen wir den Deauthentication-Angriff bezüglich seiner Praxistauglichkeit bewerten können.
-
-Im Heimnetzwerk konnte selbst nach 24 Stunden des Aufzeichnens kein Deauthentication-Frame beobachtet werden.
-Unsere Erklärung dafür ist, dass in einem Heimnetzwerk mit einem einzigen Access-Point keine Notwendigkeit für das Umverteilen von Clients besteht.
-Weiterhin erfolgen Neuauthentifizierung durch Neustart der Endgeräte bzw. durch ausreichende Entfernung vom Access-Point und muss daher nicht forciert werden.
-Folglich ist ein Deauthentication-Angriff hier auch mit wenigen gesendet Frames äußerst auffällig und mit entsprechender Hardware leicht zu erkennen.
-
-Im Firmennetzwerk hingegen wurden im Schnitt 2,2 Deauthentication-Frames pro Minute detektiert.
-Hierbei sind ausschließlich folgende Reason-Codes aufgetreten:
-\begin{itemize}
-	\item 1: Unspecified reason $\rightarrow$ kein genauer Grund angegeben
-	\item 2: Previous authentication no longer valid $\rightarrow$ der Schlüssel des verbundenen Clients soll zugunsten der Vertraulichkeit neu ausgehandelt werden
-	\item 6: Class 2 frame received from nonauthenticated STA $\rightarrow$ der Client hat versucht vor der Authentifizierung Daten zu übertragen
-	\item 8: Disassociated because sending STA is leaving (or has left) BSS $\rightarrow$ das Management-System hat entschieden den Client einer anderen Station zuzuordnen (Load-Balancing)
-\end{itemize}
-Auffällig war ebenfalls, dass die Access-Points bis zu 5 Deauthentication-Frames gleichzeitig in einem Burst gezielt an einen Client versendet haben.
-Dieses Verhalten kann dem Angreifer dabei helfen seinen Angriff zu verschleiern.
-So kann er zum Beispiel den Netzwerkverkehr für kurze Zeit analysieren um zu erkennen, mit welcher Frequenz und mit welchen Reason-Codes die Frames von den Access-Points im Zielnetzwerk versendet werden.
-In einem Firmennetzwerk ist somit der Deauthentication-Angriff als praktikabel und auch subtil zu bewerten wenn der Angreifer die nötige Zeit aufwendet um seinen Angriff entsprechend den Gegebenheiten anzupassen.
-
-Der Deauthentication-Angriff ist für den Client selbst kaum nachvollziehbar: es kommt lediglich zu einem kurzen Aussetzer in der Verbindung zum Access-Point, da die Neuauthentifizierung binnen weniger 100 Millisekunden abläuft.
-Geht man davon aus, dass der Nutzer das Smartphone im Moment der Deauthentifikation benutzt, so ist der entstehende Verbindungsabbruch für ihn in der Statusleiste erkennbar.
-Der Angreifer kann dies jedoch vermeiden indem er auf ein Zeitfenster wartet, in dem keine Datenpakete zwischen dem Access-Point und dem Client ausgetauscht werden.
-Hier kann er davon ausgehen, dass der Client das Endgerät momentan nicht bedient und eventuell gesperrt hat.
-
-Abschließend ist zu sagen, dass selbst die Erkennung eines Deauthentication-Angriffs nicht davor schützt, dass der Angreifer die Handshakes abfängt und bricht.
-Der Netzwerkadministrator müsste nach einem offensichtlichen Angriff den PSK neu festlegen und an alle Clients verteilen.
-Da diese Prozedur zu aufwändig ist, sollte durch ein ausreichend sicheres Passwort der Prozess des Handhshake-Bruteforcings nahezu unmöglich gemacht werden.
-
-
-%Sollte nur relativ kurz werden, also welche Szenarien haben wir betrachtet (Heimnetzwerke, Bahnhof mit öffentlichen Netzwerken, AP in Firmennetzwerk) und wie oft/üblich sind deauths (im Heimnetzwerken von Haus mit 7 APs kein einziges deauth Paket in c.a. 24h, Firmennetzwerk mit c.a. 30 Teilnehmern in Reichweite des Accesspoints: rund 2,2 deauth Pakete pro Minute, reason codes variieren)
