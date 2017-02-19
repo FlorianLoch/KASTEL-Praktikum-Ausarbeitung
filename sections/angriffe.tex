@@ -7,7 +7,10 @@ Aufgrund der Aufmerksamkeit, der sich dieses Thema unter Netzwerkexperten und Kr
 
 Da die Sicherheit eines solchen Verfahrens jedoch von mindestens drei Dingen abhängt -- der Sicherheit des Protokolls sowie der kryptografischen Primitiven, der fehlerfreien Implementierung und auch der Wahl eines guten Geheimnisses -- reicht dies allein nicht aus. 
 So liegt die Wahl des Geheimnisses (in diesem Fall des Netzwerkschlüssels) meist in der Hand des nicht zwingend sachverständigen Endnutzers. 
-So kann ein schlecht gewähltes Passwort oftmals durch einen durchdachten Wörterbuchangriff in realistischer Zeit gebrochen werden, ohne das Protokoll als solches angreifen zu müssen.\\
+So kann ein schlecht gewähltes Passwort oftmals durch einen durchdachten Wörterbuchangriff in realistischer Zeit gebrochen werden, ohne das Protokoll als solches angreifen zu müssen.
+
+Die im Standard beschriebenen Anforderungen an einen PSK legen lediglich eine Länge von 8 Zeichen fest. \cite{zviran1999password} zufolge wählen Nutzer im Mittel lediglich 6 Zeichen lange Passwörter und greifen darauf in 8 von 10 Fällen ausschließlich auf Buchstaben zurück. Nur 13,7 \% der in dieser Studie analysierten Passwörter waren alphanumerisch. Auch wenn man davon ausgeht, dass Privatanwender für ihr WLAN womöglich ein vergleichsweise langes Passwort wählen, da sie es nicht täglich eingeben müssen -- so werden sie vermutlich weiterhin auf Wörter oder gängige Wort-Zahl-Kombinationen zurückgreifen, um es bspw. einfach an Gäste weitergeben zu können.
+Auch finden sich immer wieder Berichte über schlechte Standardpasswörter \cite{stanched2015defaultpasswords}, mit denen die Geräte seitens des Herstellers oder ISPs ausgeliefert werden. Die Hoffnung, auf ein schwaches Passwort zu stoßen ist daher keinesfalls unbegründet -- und wie später dargelegt werden soll, hängt die gesamte Sicherheit je nach Angriff vom am schwächsten gesicherten Netzwerk ab, dass dem Gerät bekannt ist.\\
 
 Eine weitere Spielweise sind Social-Engineering-Angriffe, die auf Unwissenheit, Unaufmerksamkeit und Leichtgläubigkeit der Nutzer setzen. 
 Durch die nachfolgend beschriebene \enquote{Auskunftsfreudigkeit} der meisten Endgeräte hinsichtlich ihrer bekannten Netzwerken ergeben sich für Tools dieser Kategorie Möglichkeiten ihre Angriffe plausibel und für die meisten Nutzer authentisch wirkend durchzuführen.
