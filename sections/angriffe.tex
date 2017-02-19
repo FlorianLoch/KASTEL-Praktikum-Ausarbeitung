@@ -5,13 +5,13 @@ Tatsächlich gibt es nach dem bekannten Stand der Forschung keine Schwachstellen
 
 Aufgrund der Aufmerksamkeit, der sich dieses Thema unter Netzwerkexperten und Kryptologen in der Vergangenheit erfreute, ist nicht damit zu rechnen, dass in dem Verfahren noch grundlegende Schwachstellen gefunden werden. 
 
-Da die Sicherheit eines solches Verfahrens jedoch von mindestens drei Dingen abhängt -- der Sicherheit des Protokolls sowie der kryptografischen Primitiven, der fehlerfreien Implementierung und auch der Wahl eines guten Geheimnisses -- reicht dies allein nicht aus. 
+Da die Sicherheit eines solchen Verfahrens jedoch von mindestens drei Dingen abhängt -- der Sicherheit des Protokolls sowie der kryptografischen Primitiven, der fehlerfreien Implementierung und auch der Wahl eines guten Geheimnisses -- reicht dies allein nicht aus. 
 So liegt die Wahl des Geheimnisses (in diesem Fall des Netzwerkschlüssels) meist in der Hand des nicht zwingend sachverständigen Endnutzers. 
 So kann ein schlecht gewähltes Passwort oftmals durch einen durchdachten Wörterbuchangriff in realistischer Zeit gebrochen werden, ohne das Protokoll als solches angreifen zu müssen.\\
 
 Eine weitere Spielweise sind Social-Engineering-Angriffe, die auf Unwissenheit, Unaufmerksamkeit und Leichtgläubigkeit der Nutzer setzen. 
 Durch die nachfolgend beschriebene \enquote{Auskunftsfreudigkeit} der meisten Endgeräte hinsichtlich ihrer bekannten Netzwerken ergeben sich für Tools dieser Kategorie Möglichkeiten ihre Angriffe plausibel und für die meisten Nutzer authentisch wirkend durchzuführen.
-So strahlt zum Beispiel das Tool \textit{wifiphisher} über einen geeigneten Netzwerk-Adapter ein offenes Netzwerk mit beliebiger SSID aus und präsentiert sich verbundenen Nutzern je nach System verschiedene, teils täuschend echt aussehende Dialoge zur Eingabe des Netzwerkschlüssels. 
+So strahlt zum Beispiel das Tool \textit{wifiphisher} über einen geeigneten Netzwerk-Adapter ein offenes Netzwerk mit beliebiger SSID aus und präsentiert verbundenen Nutzern je nach System verschiedene, teils täuschend echt aussehende Dialoge zur Eingabe des Netzwerkschlüssels. 
 Um einen Nutzer in das eigene Netzwerk zu bringen nutzt das Tool den später beschriebenen Deauth-Angriff. 
 
 \textit{Fluxion} prüft die vom Benutzer getätigten Eingaben zusätzlich gegen einen mitgeschnittenen Handshake ab und kann sich so dem Benutzer gegenüber authentisch Verhalten und Falscheingaben erkennen. 
@@ -21,17 +21,18 @@ Dieser und weitere Angriffe, wie sie beispielsweise in~\cite{caneill2010attacks}
 Bei Bruteforce-Angriffen unterteilt sich die Ermittlung des Netzwerkschlüssels (PSK) in zwei elementare Schritte: 
 \begin{enumerate}
 	\item Die Erfassung eines WPA2-PSK-Handshakes während der Authentifizierungsphase zwischen Client und AP
-	\item Die nachgelagerte Suche nach einem Schlüssel, der zu einem gleichen Hashwert führt
+	\item Die nachgelagerte Suche nach einem Schlüssel, der zu einem gleichen \textit{Message Integrity Code} führt
 \end{enumerate}
-Die vermutlich subtilste Methode zur Erlangung eines Handshakes, die dem Angreifer zur Verfügung steht, ist die passive Überwachung des Netzwerkverkehrs und abzuwarten, bis sich ein Client gegenüber einem AP im gewünschten Netzwerk authentifiziert. 
+Die vermutlich subtilste Methode zur Erlangung eines Handshakes, die dem Angreifer zur Verfügung steht, ist die passive Überwachung des Netzwerkverkehrs.
+Dafür muss er lediglich abwarten, bis sich ein Client gegenüber einem AP im gewünschten Netzwerk authentifiziert. 
 Abhängig von der Netzwerkinfrastruktur und des Nutzungsverhaltens des Clients kann dies jedoch viel Zeit in Anspruch nehmen.
 Da dies für einen gezielten Angriff nicht zielführend erscheint werden nachfolgend zwei Angriffe beschrieben, die durch aktives Eingreifen in den Netzwerkverkehr die Authentifizierung des Clients forcieren.
 
 \subsubsection{Deauth-Angriff}\label{subs:deauthentication-attack}
-Wie in Kapitel~\ref{sec:grundlagen} bereits beschrieben definiert IEEE 802.11 neben Datenframes unter anderem auch Managementframes, die der Verwaltung des Netzwerkes dienen und weder verschlüsselt noch anderweitig authentifiziert auf dem exponierten Übertragungsmedium versendet werden.
+Wie in Kapitel~\ref{sec:grundlagen} bereits beschrieben definiert IEEE 802.11 neben Daten- und Kontroll-Frames unter anderem auch Management-Frames, die der Verwaltung des Netzwerkes dienen und weder verschlüsselt noch anderweitig authentifiziert auf dem exponierten Übertragungsmedium versendet werden.
 
-Dies hat zur Folge, dass ein Angreifer Managementframes erzeugen und im Netzwerk unter einem gefälschten Absender an beliebige Teilnehmer verteilen kann.
-So auch Deauthentication-Frames, mit denen ein Access-Point die erneute Authentifizierung vor einer weiteren Nutzung erzwingen kann. Der Idee ist nun sehr simpel: Der Angreifer kennt sein Opfer, gaukelt diesem durch gefälschte\footnote{In unseren Versuchen hat sich gezeigt, dass es meistens mehrerer Deauthentication-Pakete bedurfte, um den Client tatsächlich zu einem kurzzeitigen Verlassen des Netzwerkes zu bewegen. Die Wahl der Anzahl hat sich hierbei als Gratwanderung herausgestellt: werden zu wenig Pakete versendet führt der Client keine erneute Authentifizierung durch -- werden jedoch zu viele Pakete versendet, so konnten wir beobachten wie das Endgerät sich mit einem eigentlich niedriger priorisiertem Netzwerk verbunden hat, da ihm einer erneuter Verbindungsaufbau anscheinend nicht möglich erschien. Ein Wert von 20 hat sich in unseren Versuchen als zielführend erwiesen.} Deauthentication-Frames die Deauthentifizierung durch den AP vor um anschließend den provozierten Handshake mitschneiden zu können.
+Dies hat zur Folge, dass ein Angreifer Management-Frames erzeugen und im Netzwerk unter einem gefälschten Absender an beliebige Teilnehmer verteilen kann.
+So auch Deauthentication-Frames, mit denen ein Access-Point die erneute Authentifizierung eines Clients vor einer weiteren Nutzung erzwingen kann. Die Idee ist nun sehr simpel: Der Angreifer kennt sein Opfer, gaukelt diesem durch gefälschte Deauthentication-Frames die Deauthentifizierung durch den AP vor um anschließend den provozierten Handshake mitschneiden zu können.
 Die Felder des entsprechenden Deauthentication-Frame werden dabei wie folgt gesetzt:
 \begin{itemize}
 	\item als Zieladresse (DA) die MAC-Adresse des Clients
