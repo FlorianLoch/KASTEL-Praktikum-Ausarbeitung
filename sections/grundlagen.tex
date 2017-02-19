@@ -56,14 +56,14 @@ Folgend werden wir uns auf die Authentifizierung mit WPA2-PSK fokussieren.
 Dafür wird ein sogenannter \enquote{4-Way-Handshake} zwischen dem Client (\enquote{Supplicant}) und dem AP (\enquote{Authenticator}) durchgeführt.
 
 In einem vorbereitenden Schritt wird einmalig auf beiden Seiten der \enquote{Pairwise-Master-Key} (PMK) berechnet:
-\[\mathsf{PMK} = \mathsf{PBKDF2}(\mathsf{HMAC-SHA1}, \mathsf{PSK}, \mathsf{SSID}, \mathsf{4096}, \mathsf{256})\]
-Die Schlüsselableitungsfunktion PBKDF2  berechnet in 4096 Runden von HMAC-SHA1 einen 256 Bit langen Schlüssel.
+\[\mathsf{PMK} = \mathsf{PBKDF2}(\mathsf{HMAC-SHA1}, \mathsf{PSK}, \mathsf{SSID}, 4096, 256)\]
+Die Schlüsselableitungsfunktion PBKDF2\footnote{PBKDF2: \enquote{Password-based-key-derivation-function}, in RFC2898 genormte Funktion zur Ableitung von Schlüsseln aus einem Geheimnis.} berechnet in 4096 Runden von HMAC-SHA1 einen 256 Bit langen Schlüssel.
 Als Eingabe für den HMAC dienen der PSK als Schlüssel und die SSID als initiale Nachricht.
 Nach der Berechnung des PMK kann der Handshake durchgeführt werden.
 Im ersten Schritt zieht der Authenticator eine gleichverteilte\footnote{Die Noncen sollen Replay-Angriffe verhindern und werden daher zufällig gleichverteilt gezogen.} Zufallszahl, die sogenannte \enquote{ANonce}, und sendet sie an den Client.
 Danach zieht der Supplicant eine eigene Zufallszahl, die sogenannte \enquote{SNonce}, und berechnet den Pairwise-Transient Key (PTK):
 \[\mathsf{PTK} = \mathsf{PRF}(\mathsf{PMK}, \mathsf{Supp-MAC}, \mathsf{Auth-MAC}, \mathsf{SNonce}, \mathsf{ANonce})\]
-Dafür werden der PMK, die Zufallszahlen und die MAC-Adressen beider Teilnehmer in einer Pseudozufallsfunktion (PRF) evaluiert.
+Dafür werden der PMK, die Zufallszahlen und die MAC-Adressen beider Teilnehmer in einer Pseudozufallsfunktion (PRF) evaluiert\footnote{Die Funktion PRF ist ebenfalls im Standard RFC2898 definiert.}.
 Abschließend bildet der Supplicant einen Message-Integrity-Code (MIC) über seinen PTK und sendet ihn zusammen mit der SNonce an den Authenticator.
 Der Authenticator besitzt nun alle Parameter um den PTK inklusive MIC zu berechnen.
 Stimmt der von ihm gebildete MIC mit dem vom Supplicant übertragenen MIC überein so muss der Supplicant das korrekte Passwort kennen\footnote{Da eine Hash-Funktion zur Schlüsselableitung verwendet wird können weitere Passwörter existieren, die zum selben MIC führen.}.

@@ -94,7 +94,7 @@ Alternativ kann die Deauthentifikation mit wenigen Zeilen Python-Code unter Verw
 \end{minted}
 
 Nach dem Angriff wird die eingangs gestartete Netzwerkaufzeichnung mit \texttt{airodump-ng} gestoppt, um den Dump mithilfe eines geeigneten Tools, zum Beispiel \texttt{Pyrit}, zu analysieren. Dieser Schritt ist optional, die schnelle Verifikation womöglich jedoch hilfreich\footnote{Wurde die MAC-Adresse des Access-Points nicht beim Aufzeichnen des Verkehrs spezifiziert sollte sie nun mit dem Flag \texttt{-b} festgelegt werden.
-Andernfalls wird \texttt{Pyrit} für eventuell weitere aufgezeichnete Handshakes von anderen Netzwerken positiv antworten.}:
+Andernfalls wird \texttt{Pyrit} für eventuell weitere aufgezeichnete Handshakes von anderen Netzwerken positiv antworten.}: 
 \begin{Verbatim}
 	pyrit -r <Dump-Name> -b <AP-MAC> analyze
 \end{Verbatim}
@@ -102,8 +102,9 @@ Ein im Rahmen der Arbeit geschriebenes Python-Skript, welches unter Anderem die 
 Der Versuch des Brechens des erlangten Handshakes wird in Unterkapitel~\ref{subs:cracking} erläutert.
 
 \subsubsection{\enquote{Evil-Twin}-Angriff}\label{subs:evil-twin-attack}
-Ein Nachteil des Deauth-Angriffs ist, dass sowohl Client als auch AP in Reichweite des Angreifers sein müssen (\enquote{on-site}), um den Handshake zwischen beiden abfangen zu können. Der Evil-Twin-Angriff als \enquote{off-site}-Attacke hebt diese Beschränkung auf. Die Idee hierbei ist, einen AP zu imitieren, der einem dem Client bekannten Netzwerk angehört. Auf diese Weise wird der Client zur Durchführung eines Handshakes verleitet, auch wenn das eigentliche Netzwerk nicht in Reichweite ist. Je nach Quelle überlappt der Evil-Twin Angriff mit dem des \textit{Rogue-Access-Points} -- teilweise werden die Begriffe auch synonym verwendet.\\
-
+Ein Nachteil des Deauth-Angriffs ist, dass sowohl Client als auch AP in Reichweite des Angreifers sein müssen (\enquote{on-site}), um den Handshake zwischen beiden abfangen zu können. Der Evil-Twin-Angriff als \enquote{off-site}-Attacke hebt diese Beschränkung auf. Die Idee hierbei ist, einen AP zu imitieren, der einem dem Client bekannten Netzwerk angehört. Auf diese Weise wird der Client zur Durchführung eines Handshakes verleitet, auch wenn das eigentliche Netzwerk nicht in Reichweite ist. 
+%Je nach Quelle überlappt der Evil-Twin Angriff mit dem des \textit{Rogue-Access-Points} -- teilweise werden die Begriffe auch synonym verwendet.\\
+%TODO: würde ich raus nehmen... klingt blöd und die einzigen die das hier lesen werden wissen was ein evil twin ist
 Betrachtet man den Ablauf des Handshakes (siehe Unterkapitel~\ref{subs:handshake}), so stellt man fest, dass die für einen Bruteforce-Angriff wichtigen Elemente keines vollständigen Handshakes bedürfen. Benötigt werden lediglich folgende Informationen:
 \begin{itemize}
 	\item SSID des Netzwerkes 
@@ -151,36 +152,36 @@ Kennt der Angreifer keine seinem Ziel bekannten SSIDs, so kann er das \texttt{-P
 
 \texttt{Airbase-ng} wird nun auf dem ausgewählten Interface Probe-Requests von Clients auswerten, um automatisch Evil-Twins mit der vom Angreifer spezifizierten (Sicherheits-)Konfiguration zu erzeugen.
 Es empfiehlt sich, gleichzeitig einen \texttt{airodump-ng} Prozess zu starten, welcher den Verkehr des Evil-Twins separat aufzeichnet.
-Dies hat den Hintergrund, dass die Aufzeichnung von \texttt{airbase-ng} ohne spezifizierte SSID via \texttt{--essid} Flag den Wert \texttt{default} als Netzwerknamen verwendet -- anstelle des Wertes aus dem Probe-Request. Dies führt in späteren Schritten zu Problemen, denn ohne gültige SSID werden Handshakes unbrauchbar, da diese in die Berechnung des PMK mit einfließt (und von \texttt{aircrack-ng} automatisch aus dem Dump extrahiert wird).
+Dies hat den Hintergrund, dass die Aufzeichnung von \texttt{airbase-ng} ohne spezifizierte SSID via \texttt{--essid} Flag \texttt{default} als Netzwerknamen verwendet -- anstelle des Wertes aus dem Probe-Request. Dies führt in späteren Schritten zu Problemen, denn ohne gültige SSID werden Handshakes unbrauchbar, da diese in die Berechnung des PMK mit einfließt (und von \texttt{aircrack-ng} automatisch aus dem Dump extrahiert wird).
 
 \subsection{Handshake-Bruteforcing}\label{subs:cracking}
 Liegen valide Handshake-Mitschnitte vor, so kann der Angreifer versuchen den PSK offline zu brechen.
-Dafür spielt er die Schritte, die Client und AP während des Handshakes durchführen, lokal nach und wählt dabei in jedem Versuch einen neuen Passwortkandidaten.
+Dafür spielt er die Schritte, die Client und AP während des Handshakes durchführen, lokal nach und wählt in jeder Iteration einen neuen Passwortkandidaten.
 Die Vorgehensweise entspricht folgendem Algorithmus (siehe auch Abbildung~\ref{fig:wpa2handshake}):
 \begin{enumerate}
-	\item Berechne $\mathsf{PMK} = \mathsf{PBKDF2}(\mathsf{SSID}, \mathsf{PSK}, 4096, 256)$\footnote{PBKDF2: \enquote{Password-based-key-derivation-function}, in RFC2898 genormte Funktion zur Ableitung von Schlüsseln aus einem Geheimnis.}
-	\item Verwende die aufgezeichneten Noncen und berechne damit \\$\mathsf{PTK} = \mathsf{PRF}(\mathsf{Client-MAC},  \mathsf{Access-Point-MAC}, \mathsf{SNonce}, \mathsf{ANonce}, \mathsf{PMK})$\footnote{PRF ist eine Pseudonomierte-Zufalls-Funktion (PRF), ebenfalls im Standard definiert.}
+	\item Berechne $\mathsf{PMK} = \mathsf{PBKDF2}(\mathsf{SSID}, \mathsf{PSK}, 4096, 256)$
+	\item Verwende die aufgezeichneten Noncen und berechne damit \\$\mathsf{PTK} = \mathsf{PRF}(\mathsf{Client-MAC},  \mathsf{Access-Point-MAC}, \mathsf{SNonce}, \mathsf{ANonce}, \mathsf{PMK})$
 	\item Bilde den $\mathsf{MIC}$ über den $\mathsf{PTK}$-Kandidaten und vergleiche ihn mit dem aufgezeichneten $\mathsf{MIC'}$
 	\begin{enumerate}
 		\item $\mathsf{MIC} \neq \mathsf{MIC'}$: Neustart von Schritt 1
 		\item $\mathsf{MIC} = \mathsf{MIC'}$: Kollision gefunden, Handshake erfolgreich gebrochen
 	\end{enumerate}
 \end{enumerate}
-Der Großteil des (immensen) Rechenaufwands lässt sich auf das Bilden des PMKs in Schritt 1 durch $4096$ Runden PBKDF2 zurückführen. Ein AP muss diese Rechnung nur einmal durchführen, da sie lediglich von statischen Eingaben abhängt.
+Der Großteil des Rechenaufwands lässt sich auf das Bilden des PMKs in Schritt 1 durch $4096$ Runden PBKDF2 zurückführen. Ein AP muss diese Rechnung nur einmal durchführen, da sie lediglich von statischen Eingaben abhängt. %Rechenaufwand ist nicht durch die 4096 Runden "immens", sondern durch den großen Passwortraum
 Des Weiteren kann nur sehr selten auf vorab generierte PMK-Listen zurückgegriffen werden, da der PMK auch von der SSID des Netzwerkes abhängig ist. Solche Listen existieren, allerdings nur für die häufigsten SSIDs. Als Tool zu ihrer Erzeugung sei hier \texttt{coWPAtty} genannt.
 
 \paragraph{Durchführung}
 Es existieren verschiedenste Tools und Online-Services zum Brechen von WPA2-PSK Handshakes, deren Funktionsweise letztlich immer dieselbe ist.
 
-In dieser Arbeit werden die Beispiele mit \texttt{aircrack-ng} (als Teil der gleichnamigen Suite) gezeigt. Erwähnt seien jedoch noch die Programme \texttt{oclhashcat} bzw. \texttt{cudahashcat}, welche durch den Einsatz der massiven Parallelität moderner GPUs eine deutlich höhere Schlüssel/Sekunde-Rate ermöglichen sowie \texttt{John The Ripper}, welches auch unter Microsoft Windows arbeitet. Im Gegensatz zu \texttt{aircrack-ng} unterstützen diese eine Vielzahl weiterer Algorithmen neben den für WPA2-PSK benötigten.\\
+In dieser Arbeit werden die Beispiele mit \texttt{aircrack-ng} (als Teil der gleichnamigen Suite) gezeigt. Erwähnt seien jedoch noch die Programme \texttt{oclhashcat} bzw. \texttt{cudahashcat}, welche durch den Einsatz der massiven Parallelität moderner GPUs eine deutlich höhere Hashes/Sekunde-Rate ermöglichen sowie \texttt{John The Ripper}, welches auch unter Microsoft Windows arbeitet. Im Gegensatz zu \texttt{aircrack-ng} unterstützen diese eine Vielzahl weiterer Algorithmen neben den für WPA2-PSK benötigten.\\
 
-\texttt{aircrack-ng} benötigt zum Brechen ein Mitschnitt, der die ersten zwei Schritte des WPA2-PSK Handshakes enthält.
+\texttt{Aircrack-ng} benötigt zum Brechen ein Mitschnitt, der die ersten zwei Schritte des WPA2-PSK Handshakes enthält.
 Weiterhin ist eine Passwortliste erforderlich die PSK Kandidaten enthält, welche \texttt{aircrack-ng} für den aufgezeichneten Handshake prüfen soll. Alternativ können diese über die Standardeingabe hineingereicht werden.
 \begin{Verbatim}
 	aircrack-ng -w <Passwortliste> -b <AP-MAC> <Capture> # mit Liste
 	crunch ... | aircrack-ng -w - -b <AP-MAC> <Capture> # über stdin
 \end{Verbatim}
-\texttt{crunch} ist hierbei ein Tool zur Generierung von Passwortkandidaten auf Basis bestimmter Vorgaben.
+\texttt{Crunch} ist hierbei ein Tool zur Generierung von Passwortkandidaten auf Basis bestimmter Vorgaben.
 Sofern während der Aufzeichnung sichergestellt wurde, dass ausschließlich Verkehr des gewünschten Funkzelle aufgezeichnet wurde, so kann das Flag \texttt{-b} verworfen werden.
 
 \begin{figure}[ht]
