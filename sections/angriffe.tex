@@ -100,7 +100,7 @@ Ein im Rahmen der Arbeit geschriebenes Python-Skript, welches unter Anderem die 
 Der Versuch des Brechens des erlangten Handshakes wird in Unterkapitel~\ref{subs:cracking} erläutert.
 
 \subsubsection{\enquote{Evil-Twin}-Angriff}\label{subs:evil-twin-attack}
-Ein Nachteil des Deauth-Angriffs ist, dass sowohl Client als auch AP in Reichweite des Angreifers sein müssen (\enquote{on-site}), um den Handshake zwischen beiden abfangen zu können. Der Evil-Twin-Angriff als \enquote{off-site}-Attacke hebt diese Beschränkung auf. Die Idee hierbei ist, einen AP zu imitieren, der einem dem Client bekannten Netzwerk angehört. Auf diese Weise wird der Client zur Durchführung eines Handshakes verleitet, auch wenn das eigentliche Netzwerk nicht in Reichweite ist.\\
+Ein Nachteil des Deauth-Angriffs ist, dass sowohl Client als auch AP in Reichweite des Angreifers sein müssen (\enquote{on-site}), um den Handshake zwischen beiden abfangen zu können. Der Evil-Twin-Angriff als \enquote{off-site}-Attacke hebt diese Beschränkung auf. Die Idee hierbei ist, einen AP zu imitieren, der einem dem Client bekannten Netzwerk angehört. Auf diese Weise wird der Client zur Durchführung eines Handshakes verleitet, auch wenn das eigentliche Netzwerk nicht in Reichweite ist. Je nach Quelle überlappt der Evil-Twin Angriff mit dem des \textit{Rogue-Access-Points} -- teilweise werden die Begriffe auch synonym verwendet.\\
 
 Betrachtet man den Ablauf des Handshakes (siehe Unterkapitel~\ref{subs:handshake}), so stellt man fest, dass die für einen Bruteforce-Angriff wichtigen Elemente keines vollständigen Handshakes bedürfen. Benötigt werden lediglich folgende Informationen:
 \begin{itemize}
