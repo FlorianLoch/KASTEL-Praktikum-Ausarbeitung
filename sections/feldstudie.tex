@@ -41,65 +41,60 @@ Hierbei sind ausschließlich die folgenden Reason-Codes aufgetreten (wobei \enqu
 Auffällig war ebenfalls, dass die Access-Points bis zu 5 Deauthentication-Frames in einem Stoß gezielt an einen Client versendet haben.
 Dieses Verhalten kann dem Angreifer dabei helfen seinen Angriff zu verschleiern.
 So kann er zum Beispiel den Netzwerkverkehr für kurze Zeit analysieren um zu erkennen, mit welcher Frequenz und mit welchen Reason-Codes die Frames von den Access-Points im Zielnetzwerk versendet werden.
-In einem Firmennetzwerk ist somit der Deauthentication-Angriff als praktikabel und auch subtil zu bewerten wenn der Angreifer die nötige Zeit aufwendet um seinen Angriff entsprechend den Gegebenheiten anzupassen.
+In einem Firmennetzwerk ist somit der Deauthentication-Angriff als praktikabel und auch subtil zu bewerten unter der Annahme, dass der Angreifer die nötige Zeit aufwendet um seinen Angriff entsprechend den Gegebenheiten anzupassen.
 
 Der Deauthentication-Angriff ist für den Client selbst kaum nachvollziehbar: es kommt lediglich zu einem kurzen Abbruch der Verbindung zum Access-Point ($<< 1$ Sekunde), bevor die erneute Authentifizierung abgeschlossen wurde. Selbst wenn der Nutzer den Angriff bemerkt -- den erneuten Handshake wird er nicht verhindern können.\\
 
 Es lässt sich abschließend sagen, dass eine Anomalieerkennung in einem Heimnetzwerk, zumindest diesem Experiment zu Folge, gut funktionieren würde. Den Aufwand sowie den höheren Kostenfaktor eines entsprechenden Routers dürften die Anwender für ihr Heimnetz allerdings scheuen. In Firmennetzen wäre dies womöglich ein geringeres Problem. Router könnten Alarm schlagen, sobald sie Deauthentication-Frames bemerken, welche sie nicht selbst gesendet haben. Die Variante von zusätzlicher Hardware, welche Anomalien erkennt, dürfte nur sehr unscharfe Ergebnisse liefern.\\
 
-Der Nutzen einer zentralen Detektion ist jedoch weiterhin fraglich, denn letztlich kann nur den Client die erneute Authentifizierung verhindern. Da diese solche Mechanismen unseren Versuchen zu Folge jedoch nicht implementieren wird gegen Bruteforce-Angriffe lediglich ein komplexes Passwort helfen. Gegen DoS-Attacken stellt dies allerdings keinen Schutz dar.
+Der Nutzen einer zentralen Detektion ist jedoch weiterhin fraglich, denn letztlich kann nur der Client die erneute Authentifizierung verhindern. Da die Endgeräte solche Mechanismen unseren Versuchen zu Folge jedoch nicht implementieren wird gegen Bruteforce-Angriffe lediglich ein komplexes Passwort helfen. Gegen DoS-Attacken stellt dies allerdings keinen Schutz dar.
 
 \subsection{Probing-Verhalten von Endgeräten}\label{subs:praxisprobes}
 Um einen Evil-Twin Angriff (effizient) zu ermöglichen benötigt der Angreifer eine oder mehrere SSIDs von Netzwerken, die dem anzugreifenden Endgerät bekannt sind.
 Hierfür werden Probe-Requests zu Hilfe gezogen, die Endgeräte periodisch aussenden um bekannte Netzwerke zu detektieren.
-Dies variiert jedoch hinsichtlich Frequenz und Umfang, ist also abhängig vom Endgerät.
+Das Aussenden variiert jedoch hinsichtlich Frequenz und Umfang, ist also abhängig vom Endgerät.
 Alle Geräte wurden mit der zum jeweiligen Zeitpunkt aktuellsten verfügbaren Betriebssystemversion getestet. Unsere Versuche sollen nicht als Basis für einen Vergleich der verschiedenen Plattformen gesehen werden -- sie sollen allgemeine Schwachstellen qualitativ überprüfen, sie nicht quantitativ in Relation setzen. Dementsprechend wurden die Listen der, den einzelnen Geräten jeweils bekannten, Netzwerke nicht gezielt angeglichen. Der Netzwerkverkehr wurde mithilfe von \texttt{airodump-ng} aufgezeichnet und nachträglich mit eigens entwickelten Python-Skripten unter Verwendung der \texttt{Pyshark}-Bibliothek analysiert und ausgewertet.\\
 
-Das mit Windows 8.1 betrieben Nokia sowie die getesteten Smartphones unter Android 6 wiesen einen ähnlichen Probing-Verlauf auf; in der Spitze konnten bis zu 40 Anfragen pro Minute beobachtet werden.
+Das mit Windows 8.1 betriebene Nokia sowie die getesteten Smartphones unter Android 6 wiesen einen ähnlichen Probing-Verlauf auf; in der Spitze konnten bis zu 40 Anfragen pro Minute beobachtet werden.
 Auffällig -- jedoch den Erwartungen entsprechend -- war, dass im Falle der getesteten Android-Geräte mit einer größeren Menge an bekannten Netzwerken auch die Anzahl der Probe-Requests zunahm. Versteckte Netzwerke spielten dabei nur eine untergeordnete Rolle.\\
 
 Um Geräte weiterer Hersteller zu analysieren, wurden Probe-Requests in einer stark frequentierten Bahnhofshalle gemessen. Dabei wurde die Auskunftsfreudigkeit von (Android-)Endgeräten bestätigt. Der Rückschluss auf Android als Betriebssystem ist über die Auflösung der MAC-Adresse auf den jeweiligen Hersteller erfolgt\footnote{Ein Rückschluss auf die eingesetzte Version ist im allgemeinen nicht möglich.}.
-Das mittlerweile gängige Verfahren der MAC-Randomization, bei welchem der vom Hersteller kontrollierte Teil der Adresse randomisiert wird um das Tracking von Endgeräten auf Basis ihrer Probe-Requests zu erschweren, wirkt sich hierbei nicht aus -- konnte bei den von uns kontrollierten Geräten jedoch beobachtet werden.
-Weiterhin konnte bei den Android-Geräten eine Tendenz festgestellt werden, alle bekannten SSIDs schubweise binnen weniger hundert Millisekunden zu versenden.\\
+Das mittlerweile gängige Verfahren der MAC-Randomization~\cite{android6changes, windows10wireless}, bei welchem der vom Hersteller kontrollierte Teil der Adresse randomisiert wird um das Tracking von Endgeräten auf Basis ihrer Probe-Requests zu erschweren, wirkt sich hierbei nicht aus -- konnte bei den von uns kontrollierten Geräten jedoch beobachtet werden.
+Weiterhin konnte festgestellt werden, dass Android-Geräte eine Tendenz zum schubartigen Aussenden von Probe-Requests aufweisen.
+So wurden binnen weniger 100 Millisekunden alle bekannten SSIDs im Netz veröffentlicht.\\
 
 Das Elephone P9000 sendete sogar weiterhin Probe-Requests, obwohl es mit einem Wireless-Netzwerk verbunden war. Dieses Verhalten konnten wir bei dem genutzten Samsung Galaxy S7 Edge nicht beobachten. Dies lässt vermuten, dass Hersteller entsprechende Teile des Netzwerk-Stacks anpassen und dementsprechend allgemein eine große Abweichung hinsichtlich des Verhaltens im Segment der Android-Smartphones bestehen dürfte.
 Potenzielle Erklärungen für das Aussenden von Probe-Request trotz bestehender Verbindung könnten dabei sein, dass das Gerät versucht sich über die umgebenden Netzwerke zu lokalisieren, oder dass es hofft, ein stärkeres, bekanntes Netzwerk in Reichweite zu finden.\\
 
-Die Apple-Geräte sowie der mit Windows 10 betriebene Laptop schienen hingegen sparsamer mit Probe-Requests umzugehen -- auf technisch notwendige Probes haben allerdings auch sie sich nicht beschränkt.
+Die Apple-Geräte sowie der mit Windows 10 betriebene Laptop schienen hingegen sparsamer mit Probe-Requests umzugehen -- auf technisch notwendige Probes haben allerdings auch sie sich nicht beschränkt.\\
+
 Abschließend ist zu sagen, dass keines der getesteten Geräte gänzlich auf Probe-Requests verzichtet hat.
 Daher ist die Vorbereitung eines Evil-Twin Angriffs als absolut praktikabel einzustufen.
 
-\subsection{Anfälligkeit der Endgeräte gegenüber einem \enquote{Evil Twin}}
+\subsection{Anfälligkeit der Endgeräte gegenüber einem \enquote{Evil-Twin}}
 Nachdem festgestellt worden ist, dass mit wenig Aufwand bekannte SSIDs anhand von Probe-Requests ermittelt werden können, sollte geprüft werden, ob die genannten Geräte eventuelle Schutzmechanismen gegen Evil-Twin Angriffe implementieren.\\
 
-Der Testaufbau bestand darin, auf allen oben genannten Endgeräten das WPA2-PSK geschützte Netzwerk mit der SSID \enquote{Tor-zum-Internet} bekannt zu machen, bzw. die Zugangsdaten zu hinterlegen.
-Anschließend wurde ein passender Evil-Twin mit dieser SSID via \texttt{airbase-ng} gestartet. Es erfolgte dabei keine Konfiguration, die das Internet tatsächlich über den gefälschten AP erreichbar gemacht hätte. Dieser Schritt wäre erst sinnvoll, wenn der PSK bekannt wäre und ein MITM-Angriff durchgeführt werden sollte. Der eigentliche AP von \enquote{Tor-zum-Internet} wurde ausgeschaltet und das Off-Site-Szenario zu erreichen.
+Der Testaufbau bestand darin, auf allen oben genannten Endgeräten das WPA2-PSK geschützte Netzwerk mit der SSID \enquote{Tor\_zum\_Internet} bekannt zu machen, bzw. die Zugangsdaten zu hinterlegen.
+Anschließend wurde ein passender Evil-Twin mit dieser SSID via \texttt{airbase-ng} gestartet. Es erfolgte dabei keine Konfiguration, die das Internet tatsächlich über den gefälschten AP erreichbar gemacht hätte. Dieser Schritt wäre erst sinnvoll, wenn der PSK bekannt wäre und ein MITM-Angriff durchgeführt werden sollte. Der eigentliche AP von \enquote{Tor\_zum\_Internet} wurde ausgeschaltet um das Off-Site-Szenario zu erreichen.
 Die Endgeräte wurden während der Durchführung des Angriffs nicht bedient und waren nicht in Reichweite anderer bekannter Netzwerke.
 
-An dieser Stelle ist es wichtig wiederholt zu erwähnen, dass der Handshake (siehe~\ref{subs:handshake}) im Schritt 3 durch den Evil-Twin abgebrochen wird -- es nicht zu einer bestehenden Verbindung kommt.
-So zeichneten sich die Samsung-Geräte durch ein aggressives Assoziierungsverhalten aus: Mit einer Rate von ca. zwei Authentifizierungen pro Sekunde stach dieses Endgerät besonders heraus.
-Wurde ein weiteres Netzwerk bekannt gemacht, dessen AP räumlich jedoch deutlich aufgestellt war, so konnte sogar beobachtet werden, wie das Endgerät von dem, mit dem Internet verbundenen, AP zum stärker sendendem, jedoch nicht mit dem Internet verbundenen, AP zu wechseln versuchte. 
+An dieser Stelle ist es wichtig wiederholt zu erwähnen, dass der Handshake (siehe~\ref{subs:handshake}) im Schritt 3 durch den Evil-Twin abgebrochen wird -- es also nicht zu einer funktionsfähigen Verbindung kommt.
+So zeichnete sich das Samsung Galaxy S6 Edge durch ein aggressives Assoziierungsverhalten aus: Mit einer Rate von ca. zwei Authentifizierungen pro Sekunde stach dieses Endgerät besonders heraus.
+Wurde ein weiteres Netzwerk bekannt gemacht, dessen AP räumlich jedoch deutlich aufgestellt war, so konnte sogar beobachtet werden, wie das Endgerät von verbundenen AP zum stärker sendendem AP ohne Internetzugang zu wechseln versuchte. 
 In diesem Fall konnte der Evil-Twin für einen Denial-of-Service Angriff missbraucht werden -- der Anwender wäre ohne es zu merken nicht mehr online, auch da das Gerät eine mögliche und prinzipiell aktivierte LTE-Verbindung als Rückgriff nicht nutze.
 
 Die übrigen Smartphones haben nach zwei bis vier gescheiterten automatischen Authentifizierungen aufgegeben und sind auf die Nutzung von mobilem Internet zurückgefallen.
 Dieses Verhalten wiederholte sich jedoch periodisch in Zeitabständen von 30 bis 60 Sekunden.\\
 
 Es hat sich der Eindruck manifestiert, dass wenn mehrere bekannte Netzwerke in Reichweite sind, die meisten Endgeräte das stärkste Netzwerk auswählen -- nicht nur bei einem initialen Verbindungsaufbau sondern auch bei bereits bestehender Verbindung. Dies erleichtert einen Evil-Twin Angriff, da sich keine zusätzliche Bedingung aus dem aktuellen Status des Opfers ergibt.
-Wir konnten dieses Verhalten bei allen Endgeräten Ausnutzen, um sie zur Authentifikation mit dem Evil-Twin zu verleiten.
+Wir konnten dieses Verhalten bei allen Endgeräten Ausnutzen, um sie zur Authentifikation mit dem Evil-Twin zu verleiten.\\
 
 Ist der Typ des Netzwerks vorher nicht bekannt kann der Angreifer, wie bereits erwähnt, mehrere Evil-Twins auf dem Netzwerkinterface öffnen.
 Alle getesteten Endgeräte haben sich in diesem Fall mit dem Access-Point mit der passenden Sicherheitskonfiguration verbunden.
 Wurde absichtlich eine falsche Konfiguration angeboten, so haben dies lediglich das Windows Phone sowie der Windows 10 betriebene Laptop erkannt und den Nutzer entsprechend gewarnt. %TODO Bild hier
 Erstaunlicherweise haben die übrigen Endgeräte sich in einen offenen Evil-Twin ohne jegliche Verschlüsselung locken lassen, womit einem Man-in-the-Middle Angriff Tür und Tor geöffnet wird. Hierdurch entfällt jedwede, eigentlich geforderte implizite Authentifizierung des AP durch Kenntnis des PSK zur Durchführung der Kommunikation.\\
 
-Zusammenfassend ist der Evil-Twin als ein -- wenn auch wenig subtiler -- hochflexibler Angriff zu bewerten. Er kann Off-Site eingesetzt werden, der reale AP ist für den Angriff nicht von Nöten.
+Zusammenfassend ist der Evil-Twin als ein -- wenn auch wenig subtiler -- hochflexibler Angriff zu bewerten. Er kann Off-Site eingesetzt werden, weswegen der reale AP für den Angriff nicht von Nöten ist.
 Eigenen Tests nach harmoniert der Evil-Twin Angriff sehr gut mit dem Deauthentication-Angriff.
 So kann ein bereits mit einem anderen Netzwerk verbundener Client so lange deauthentifiziert werden, bis er sich mit dem Evil-Twin verbindet.
 Einziger Nachteil bleibt, dass der Evil-Twin in der Umgebung für alle sichtbar ist und somit leicht erkannt werden kann -- dies lässt sich jedoch durch ein \enquote{gezieltes Broadcasting} von Beacon-Frames oder dem Einsatz des Probe-Request-Response Schema von versteckten Netzwerken abschwächen.
-
-%(geht ein wenig einher mit dem Aussenden bekannter SSIDs, aber nicht unbedingt, da ich den Evil Twin Angriff auch auf Stationen anwenden kann, die gerade mit einem AP verbunden sind)
-%Nicht alle Endgeräte connecten automatisch mit dem Evil Twin
-%Windows Phone scheint sich nicht nur die SSID+MAC (die wir beide spoofen können) zu merken, sondern auch gewisse Netzwerkeinstellungen für den AP ("airbase-ng -Z 2" flag setzten um WPA2 AP aufzubauen)
-
-%Des weiteren verwenden Apple-Geräte MAC-Randomization um ihre eindeutige Identität zu verschleiern und gezielte Angriffe gegen sie zu erschweren.
-%Dieser Mechanismus hat jedoch keine Auswirkung a
