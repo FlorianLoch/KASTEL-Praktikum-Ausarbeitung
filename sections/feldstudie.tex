@@ -1,46 +1,49 @@
 \section{Feldstudie}
-Um die Praktikabilität der Angriffe zu verifizieren haben wir ihre Erfordernisse (z.B. das Aussenden von Probe-Requests) in mehreren Feldstudien überprüft.
-Hierfür wurde der Netzwerkverkehr in variierenden Umgebungen, sowie das Verhalten von Endgeräten gegenüber den Angriffen analysiert.
-Die Leitfragen des folgenden Kapitels sind dabei:
+Um die Praktikabilität der Angriffe grundlegend zu verifizieren, haben wir bisher gemachte Annahmen hinsichtlich erfüllter Voraussetzungen effizienter Angriffe (z.B. das Aussenden von Probe-Requests durch in Clients) in mehreren Feldstudien überprüft.
+
+Hierfür wurde der Netzwerkverkehr in verschiedenen Umgebungen, sowie das Verhalten von Endgeräten im Falle eines Angriffs, analysiert.
+Den folgenden Fragen wurde nachgegangen:
 \begin{itemize}
-	\item Welche Endgeräte senden in welcher Frequenz Probe-Requests?
-	\item Wie anfällig sind Endgeräte bezüglich dem Evil-Twin Angriff?
-	\item Können Deauthentication-Angriffe im eigenen Netzwerk erkannt werden?
+	\item Welche Endgeräte senden in welcher Frequenz Probe-Requests aus?
+	\item Wie anfällig sind Endgeräte bezüglich des Evil-Twin Angriffs?
+	\item Können Deauth-Angriffe im eigenen Netzwerk erkannt werden bzw. von regulärem Netzwerkverkehr unterschieden werden?
 \end{itemize}
 
-\subsection{Probe-Request Verhalten der Endgeräte}\label{subs:praxisprobes}
-Um einen Evil-Twin Angriff zu ermöglichen benötigt der Angreifer eine oder mehrere SSIDs von Netzwerken, die dem anzugreifenden Endgerät bekannt sind.
-Hierfür wurden die Probe-Requests zu Hilfe gezogen, die Endgeräte periodisch aussenden um bekannte Netzwerke zu detektieren.
-Diese variieren jedoch in ihrer Frequenz und Fülle abhängig vom Endgerät.
-Wir haben Smartphones und Laptops verschiedener Hersteller auf ihr Verhalten geprüft:
+\subsection{Probing-Verhalten von Endgeräten}\label{subs:praxisprobes}
+Um einen Evil-Twin Angriff (effizient) zu ermöglichen benötigt der Angreifer eine oder mehrere SSIDs von Netzwerken, die dem anzugreifenden Endgerät bekannt sind.
+Hierfür werden Probe-Requests zu Hilfe gezogen, die Endgeräte periodisch aussenden um bekannte Netzwerke zu detektieren.
+Dies variiert jedoch hinsichtlich Frequenz und Umfang, ist also abhängig vom Endgerät.
+Es wurden verschiedene, zur Verfügung stehende Smartphones und Notebooks unterschiedlicher Hersteller auf ihr Verhalten geprüft:
 \begin{itemize}
-	\item Nokia Lumia 530 (Windows 8.1)
+	\item Nokia Lumia 530 (Windows Phone 8.1)
 	\item Elephone P9000, Samsung Galaxy S7 Edge, Samsung Galaxy S6 Edge (Android 6)
 	\item Lenovo Thinkpad T550 (Windows 10)
-	\item Apple MacBook Pro 15 (Mid 2015), Apple MacBook Pro 13 () %TODO!
+	\item Apple MacBook Pro 15 (Mid 2015), Apple MacBook Pro 13 (Mid 2014) (macOS 10.12)
 \end{itemize}
-Der Netzwerkverkehr wurde mithilfe von \texttt{airodump-ng} aufgezeichnet und nachträglich mit eigens entwickelten Python-Scripten auf Grundlage von \texttt{Pyshark} analysiert und ausgewertet.
+Alle Geräten wurden mit der zum jeweiligen Zeitpunkt aktuellsten verfügbaren Betriebssystemversion getestet. Unsere Versuche sollen nicht als Basis für einen Vergleich der verschiedenen Plattformen gesehen werden -- sie sollen allgemeine Schwachstellen qualitativ überprüfen, sie nicht quantitativ in Relation setzen. Dementsprechend wurden die Listen der, den einzelnen Geräten jeweils bekannten, Netzwerke nicht gezielt angeglichen. Der Netzwerkverkehr wurde mithilfe von \texttt{airodump-ng} aufgezeichnet und nachträglich mit eigens entwickelten Python-Skripten unter Verwendung der \texttt{Pyshark}-Bibliothek analysiert und ausgewertet.\\
 
+Das mit Windows 8.1 betrieben Nokia sowie die getesteten Smartphones unter Android 6 wiesen einen ähnlichen Probing-Verlauf auf; in der Spitze konnten bis zu 40 Anfragen pro Minute beobachtet werden.
+Auffällig -- jedoch den Erwartungen entsprechend -- war, dass im Falle der getesteten Android-Geräte mit einer größeren Menge an bekannten Netzwerken auch die Anzahl der Probe-Requests zunahm. Versteckte Netzwerke spielten dabei nur eine untergeordnete Rolle.\\
 
-Windows 8.1 sowie Android 6 Smartphones wiesen einen ähnlichen Probe-Request-Verlauf auf und sendeten bis zum 40 Anfragen pro Minute aus.
-Auffällig für die getesteten Android-Geräte war jedoch, dass mit steigender Anzahl bekannter SSIDs die Anzahl der Probe-Requests stiegen.
-Beim überwachen des relevanten Netzwerkverkehrs an öffentlichen Plätzen wurde die Auskunftsfreudigkeit von Android-Endgeräten bestätigt\footnote{Diese Werte sind natürlich nur approximativ, da wir aufgrund des Herstellers (Vendor-MAC) auf das Endgerät schließen mussten und Nutzerpräferenzen nicht berücksichtigen konnten.}. %TODO: noch was wegen MAC-Randomization erwähnen? Machts halt auch schwerer
-Weiterhin tendieren Android-Geräte dazu alle bekannten SSIDs burstartig binnen weniger hundert Millisekunden zu versenden.
-Das Elephone P9000 sendete sogar weiter Probe-Requests, obwohl es mit einem Wireless-Netzwerk verbunden war.
-Wir vermuten an dieser Stelle, dass die Ursache Location-Services sind oder das Ziel, stärkere Netzwerke in Reichweite zu finden.
-Die Apple-Geräte sowie der Windows 10 Laptop hingegen schienen sparsamer mit Probe-Requests umzugehen.
-Diese sendeten lediglich drei bis zehn Anfragen pro Minute aus.
+Um Geräte weiterer Hersteller zu analysieren, wurden Probe-Requests in einer stark frequentierten Bahnhofshalle gemessen. Dabei wurde die Auskunftsfreudigkeit von (Android-)Endgeräten bestätigt. Der Rückschluss auf Android als Betriebssystem ist über die Auflösung der MAC-Adresse auf den jeweiligen Hersteller erfolgt\footnote{Ein Rückschluss auf die eingesetzte Version ist im allgemeinen nicht möglich.}.
+Das mittlerweile gängige Verfahren der MAC-Randomization, bei welchem der vom Hersteller kontrollierte Teil der Adresse randomisiert wird um das Tracking von Endgeräten auf Basis ihrer Probe-Requests zu erschweren, wirkt sich hierbei nicht aus -- konnte bei den von uns kontrollierten Geräten jedoch beobachtet werden.
+Weiterhin konnte bei den Android-Geräten eine Tendenz festgestellt werden, alle bekannten SSIDs schubweise binnen weniger hundert Millisekunden zu versenden.\\
+
+Das Elephone P9000 sendete sogar weiterhin Probe-Requests, obwohl es mit einem Wireless-Netzwerk verbunden war. Dieses Verhalten konnten wir bei dem genutzten Samsung Galaxy S7 Edge nicht beobachten. Dies lässt vermuten, dass Hersteller entsprechende Teile des Netzwerk-Stacks anpassen und dementsprechend allgemein eine große Abweichung hinsichtlich des Verhaltens im Segment der Android-Smartphones bestehen dürfte.
+Potenzielle Erklärungen für das Aussenden von Probe-Request trotz bestehender Verbindung könnten dabei sein, dass das Gerät versucht sich über die umgebenden Netzwerke zu lokalisieren, oder dass es hofft, ein stärkeres, bekanntes Netzwerk in Reichweite zu finden.\\
+
+Die Apple-Geräte sowie der mit Windows 10 betriebene Laptop schienen hingegen sparsamer mit Probe-Requests umzugehen -- auf technisch notwendige Probes haben allerdings auch sie sich nicht beschränkt.
 Abschließend ist zu sagen, dass keines der getesteten Geräte gänzlich auf Probe-Requests verzichtet hat.
-Daher ist die Vorbereitung des Evil-Twin Angriffs als durchaus praktikabel zu bewerten.
+Daher ist die Vorbereitung eines Evil-Twin Angriffs als absolut praktikabel einzustufen.
 
-\subsection{Anfalligkeit der Endgeräte: Evil Twin}
-Nachdem festgestellt wurde, dass wir mit wenig Aufwand SSIDs aus Probe-Requests des Endgeräts erhalten können, wollen wir nun prüfen, ob eventuelle Schutzmechanismen gegen einen Evil-Twin Angriff existieren.
-Wir verwenden die Geräte des vorherigen Tests um ein möglichst breites Herstellersprektrum abzudecken.
-Auf allen Endgeräten wurde das WPA2-PSK geschützte Netzwerk mit der SSID \enquote{Tor-zum-Internet} zu der Liste bekannter Netzwerke hinzugefügt.
-Anschließend wurde, wie in der Durchführung erläutert, ein passender Evil-Twin mit der selben SSID via \texttt{airbase-ng} mit der passenden Konfiguration gestartet.
+\subsection{Anfälligkeit der Endgeräte gegenüber einem \enquote{Evil Twin}}
+Nachdem festgestellt worden ist, dass mit wenig Aufwand bekannte SSIDs anhand von Probe-Requests ermittelt werden können, sollte geprüft werden, ob die genannten Geräte eventuelle Schutzmechanismen gegen Evil-Twin Angriffe implementieren.\\
+
+Der Testaufbau bestand darin, auf allen oben genannten Endgeräten das WPA2-PSK geschützte Netzwerk mit der SSID \enquote{Tor-zum-Internet} bekannt zu machen, bzw. die Zugangsdaten zu hinterlegen.
+Anschließend wurde ein passender Evil-Twin mit dieser SSID via \texttt{airbase-ng} gestartet. Der eigentliche AP von \enquote{Tor-zum-Internet} wurde ausgeschaltet und das Off-Site-Szenario zu erreichen.
 Die Endgeräte wurden während der Durchführung des Angriffs nicht bedient und waren nicht in Reichweite anderer bekannter Netzwerke.
 
-An dieser Stelle ist es wichtig nochmals zu erwähnen, dass der Handshake im Schritt 3 vom Evil-Twin abgelehnt wird.
+An dieser Stelle ist es wichtig wiederholt zu erwähnen, dass der Handshake (siehe~\ref{subs:handshake}) im Schritt 3 durch den Evil-Twin abgebrochen wird.
 Daraus resultiert unter anderem das unterschiedliche Verhalten der einzelnen Android-Endgeräte trotz gleicher Betriebssystemversion.
 So zeichnete sich das Samsung Galaxy S6 Edge durch ein aggressives Authentifizierungsverhalten aus: Mit einer Rate von ca. zwei Authentifizierungen pro Sekunde stoch dieses Endgerät besonders heraus.
 Da es sich immer mit dem stärksten verfügbaren Netzwerk verbunden hat, hatte das Smartphone keinen Internetzugang mehr (z.B. über mobiles Datenvolumen).
