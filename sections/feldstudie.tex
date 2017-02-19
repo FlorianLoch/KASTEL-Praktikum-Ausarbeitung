@@ -18,48 +18,36 @@ Es wurden verschiedene, zur Verfügung stehende Smartphones und Notebooks unters
 \end{itemize}
 
 \subsection{Detektion von Deauth-Angriffen}
-Zwar hängt die Durchführbarkeit eines Deauth-Angriffes nicht von seiner Nachweisbarkeit ab -- der Nutzen womöglich schon. Ist der Angriff offensichtlich und bspw. von einem (besseren) Router sicher detektierbar, so wird ein mitgeschnittenes Passwort u. U. sehr schnell durch ein neues ersetzt.
-Da keines der getesteten Endgeräte Schutzmechanismen gegenüber dem Deauthentication-Angriff aufweist, verzichten wir auf eine ausführliche Beschreibung und fokussieren uns auf dessen Erkennung auf Netzwerkebene. Allerdings wäre die Detektion auf dem attackierten Gerät selbst am sinnvollsten, denn ein Angriff könnte durchaus so ausgeführt werden, dass der AP keine Chance hat, die Deauthentication-Frames überhaupt zu empfangen.
+Zwar hängt die Durchführbarkeit eines Deauth-Angriffes nicht von seiner Nachweisbarkeit ab -- der Nutzen womöglich schon. Ist der Angriff offensichtlich und bspw. von einem (besseren) Router sicher detektierbar, so wird ein mitgeschnittenes Passwort u. U. sehr schnell durch ein neues ersetzt. Allerdings dürfte bereits dies schmerzhaft für den Betreiber des Netzes sein.\\
+Da keines der getesteten Endgeräte Schutzmechanismen gegenüber dem Deauthentication-Angriff aufweist, verzichten wir auf eine ausführliche Beschreibung und fokussieren uns auf dessen Erkennung auf Netzwerkebene. Allerdings wäre die Detektion auf dem attackierten Gerät selbst am sinnvollsten, denn die Vermeidung eines erneuten Handshakes obliegt letztlich diesem. Zudem kann ein Angriff durchaus so ausgeführt werden, dass der AP keine Chance hat, die Deauthentication-Frames überhaupt zu empfangen.
 Ein Angreifer könnte in einem aufwendigeren Szenario seine Position zum Senden der Deauthentication-Frames\footnote{Wie in~\ref{subs:deauthentication-attack} erwähnt eignen sich auch Disassociation-Frames für die Durchführung dieses Angriffs} so wählen, dass die Reichweite den AP nicht mehr umfasst und mit einem zweiten Empfänger, welcher sowohl in Reichweite des Clients als auch des APs ist, den Handshake mitschneiden.
 Dies würde auch auf der Erkennung von Anomalien basierende Ansätze wie den in~\ref{cheema2011deauthentication} beschriebenen ins Leere laufen lassen. Wie plausibel eine solche Anomalieerkennung jedoch für das einfache Angriffsmodel erscheint, haben wir mit zwei Messungen in unterschiedlichen Umfeldern in Erfahrung bringen wollen:
 \begin{enumerate}
-	\item \textbf{WPA2-PSK Heimnetzwerk} mit einem (Endverbraucher-)AP und 8 Teilnehmern, die sich selten aus der Reichweite des Access-Points entfernen
+	\item \textbf{WPA2-Personal Heimnetzwerk} mit einem (Endverbraucher-)AP und 8 Teilnehmern, die sich selten aus der Reichweite des Access-Points entfernen
 	\item \textbf{WPA2-Enterprise Firmennetzwerk} mit 3 (Enterprise-)APs und ca. 30 Teilnehmern, die sich häufig zwischen den einzelnen Access-Points bewegen
 \end{enumerate}
-Wir gehen davon aus, dass das Verhalten des Managementsystem des Firmennetzwerk unabhängig vom konkreten WPA2-Authentifizierungsverfahren ist.
-Daher ist anzunehmen, dass sich ein WPA2-EAP geschütztes Netzwerk ähnlich einem WPA2-PSK geschützten verhält.
-Aus den Merkmalen des Verkehrs, wie beispielsweise Typ, Häufigkeit und Inhalt der Deauthentication-Frames, können wir Eigenschaften ableiten mit denen wir den Deauthentication-Angriff bezüglich seiner Praxistauglichkeit bewerten können.
+Aus den Merkmalen des Verkehrs, wie beispielsweise Häufigkeit und Reason-Code der Deauthentication-Frames, können wir Eigenschaften ableiten mit denen wir den Deauthentication-Angriff bezüglich seiner Praxistauglichkeit bewerten können.\\
 
-Im Heimnetzwerk konnte selbst nach 24 Stunden des Aufzeichnens kein Deauthentication-Frame beobachtet werden.
-Unsere Erklärung dafür ist, dass in einem Heimnetzwerk mit einem einzigen Access-Point keine Notwendigkeit für das Umverteilen von Clients besteht.
-Weiterhin erfolgen Neuauthentifizierung durch Neustart der Endgeräte bzw. durch ausreichende Entfernung vom Access-Point und muss daher nicht forciert werden.
-Folglich ist ein Deauthentication-Angriff hier auch mit wenigen gesendet Frames äußerst auffällig und mit entsprechender Hardware leicht zu erkennen.
+Im Heimnetzwerk konnte selbst nach 24 Stunden des Aufzeichnens kein Deauthentication-Frame beobachtet werden. Dies ist vermutlich darauf zurückzuführen, dass bei einem AP in einem Heimnetzwerk weder das Verschieben von Clients zwischen APs möglich, noch mit dem Verfall einer Zugangsberechtigung zu rechnen ist.
 
-Im Firmennetzwerk hingegen wurden im Schnitt 2,2 Deauthentication-Frames pro Minute detektiert.
-Hierbei sind ausschließlich folgende Reason-Codes aufgetreten:
+Im Firmennetzwerk hingegen wurden ca. 2 Deauthentication-Frames pro Minute detektiert.
+Hierbei sind ausschließlich die folgenden Reason-Codes aufgetreten (wobei \enquote{STA} als Abkürzung für \enquote{Station} steht und einen Client beschreibt):
 \begin{itemize}
-	\item 1: Unspecified reason $\rightarrow$ kein genauer Grund angegeben
-	\item 2: Previous authentication no longer valid $\rightarrow$ der Schlüssel des verbundenen Clients soll zugunsten der Vertraulichkeit neu ausgehandelt werden
-	\item 6: Class 2 frame received from nonauthenticated STA $\rightarrow$ der Client hat versucht vor der Authentifizierung Daten zu übertragen
-	\item 8: Disassociated because sending STA is leaving (or has left) BSS $\rightarrow$ das Management-System hat entschieden den Client einer anderen Station zuzuordnen (Load-Balancing)
+	\item 1: \enquote{Unspecified reason}
+	\item 2: \enquote{Previous authentication no longer valid}
+	\item 6: \enquote{Class 2 frame received from nonauthenticated STA}
+	\item 8: \enquote{Disassociated because sending STA is leaving (or has left) BSS}
 \end{itemize}
-Auffällig war ebenfalls, dass die Access-Points bis zu 5 Deauthentication-Frames gleichzeitig in einem Burst gezielt an einen Client versendet haben.
+Auffällig war ebenfalls, dass die Access-Points bis zu 5 Deauthentication-Frames in einem Stoß gezielt an einen Client versendet haben.
 Dieses Verhalten kann dem Angreifer dabei helfen seinen Angriff zu verschleiern.
 So kann er zum Beispiel den Netzwerkverkehr für kurze Zeit analysieren um zu erkennen, mit welcher Frequenz und mit welchen Reason-Codes die Frames von den Access-Points im Zielnetzwerk versendet werden.
 In einem Firmennetzwerk ist somit der Deauthentication-Angriff als praktikabel und auch subtil zu bewerten wenn der Angreifer die nötige Zeit aufwendet um seinen Angriff entsprechend den Gegebenheiten anzupassen.
 
-Der Deauthentication-Angriff ist für den Client selbst kaum nachvollziehbar: es kommt lediglich zu einem kurzen Aussetzer in der Verbindung zum Access-Point, da die Neuauthentifizierung binnen weniger 100 Millisekunden abläuft.
-Geht man davon aus, dass der Nutzer das Smartphone im Moment der Deauthentifikation benutzt, so ist der entstehende Verbindungsabbruch für ihn in der Statusleiste erkennbar.
-Der Angreifer kann dies jedoch vermeiden indem er auf ein Zeitfenster wartet, in dem keine Datenpakete zwischen dem Access-Point und dem Client ausgetauscht werden.
-Hier kann er davon ausgehen, dass der Client das Endgerät momentan nicht bedient und eventuell gesperrt hat.
+Der Deauthentication-Angriff ist für den Client selbst kaum nachvollziehbar: es kommt lediglich zu einem kurzen Abbruch der Verbindung zum Access-Point ($<< 1$ Sekunde), bevor die erneute Authentifizierung abgeschlossen wurde. Selbst wenn der Nutzer den Angriff bemerkt -- den erneuten Handshake wird er nicht verhindern können.\\
 
-Abschließend ist zu sagen, dass selbst die Erkennung eines Deauthentication-Angriffs nicht davor schützt, dass der Angreifer die Handshakes abfängt und bricht.
-Der Netzwerkadministrator müsste nach einem offensichtlichen Angriff den PSK neu festlegen und an alle Clients verteilen.
-Da diese Prozedur zu aufwändig ist, sollte durch ein ausreichend sicheres Passwort der Prozess des Handhshake-Bruteforcings nahezu unmöglich gemacht werden.
+Es lässt sich abschließend sagen, dass eine Anomalieerkennung in einem Heimnetzwerk, zumindest diesem Experiment zu Folge, gut funktionieren würde. Den Aufwand sowie den höheren Kostenfaktor eines entsprechenden Routers dürften die Anwender für ihr Heimnetz allerdings scheuen. In Firmennetzen wäre dies womöglich ein geringeres Problem. Router könnten Alarm schlagen, sobald sie Deauthentication-Frames bemerken, welche sie nicht selbst gesendet haben. Die Variante von zusätzlicher Hardware, welche Anomalien erkennt, dürfte nur sehr unscharfe Ergebnisse liefern.\\
 
-
-%Sollte nur relativ kurz werden, also welche Szenarien haben wir betrachtet (Heimnetzwerke, Bahnhof mit öffentlichen Netzwerken, AP in Firmennetzwerk) und wie oft/üblich sind deauths (im Heimnetzwerken von Haus mit 7 APs kein einziges deauth Paket in c.a. 24h, Firmennetzwerk mit c.a. 30 Teilnehmern in Reichweite des Accesspoints: rund 2,2 deauth Pakete pro Minute, reason codes variieren)
-
+Der Nutzen einer zentralen Detektion ist jedoch weiterhin fraglich, denn letztlich kann nur den Client die erneute Authentifizierung verhindern. Da diese solche Mechanismen unseren Versuchen zu Folge jedoch nicht implementieren wird gegen Bruteforce-Angriffe lediglich ein komplexes Passwort helfen. Gegen DoS-Attacken stellt dies allerdings keinen Schutz dar.
 
 \subsection{Probing-Verhalten von Endgeräten}\label{subs:praxisprobes}
 Um einen Evil-Twin Angriff (effizient) zu ermöglichen benötigt der Angreifer eine oder mehrere SSIDs von Netzwerken, die dem anzugreifenden Endgerät bekannt sind.
