@@ -78,8 +78,9 @@ Sind die MAC-Adressen des Clients und des AP bekannt startet der Angreifer mit H
 \begin{Verbatim}
 	aireplay-ng -0 <Anzahl> -a <AP-MAC> -c <Client-MAC> <Interface>
 \end{Verbatim}
-\texttt{-0} kennzeichnet dabei den Deauth-Angriff.
-Via \texttt{<Anzahl>} kann spezifiziert werden, wie viele Deauthentication-Frames an das Ziel gesendet werden (bzgl. Anzahl siehe oben).
+Das Flag \texttt{-0} kennzeichnet dabei den Deauth-Angriff.
+Via \texttt{<Anzahl>} kann spezifiziert werden, wie viele Deauthentication-Frames an das Ziel gesendet werden.
+In unseren Versuchen hat sich gezeigt, dass es meistens mehrerer Deauthentication-Pakete bedurfte, um den Client tatsächlich zu einem kurzzeitigen Verlassen des Netzwerkes zu bewegen. Die Wahl der Anzahl hat sich hierbei als Gratwanderung herausgestellt: werden zu wenig Pakete versendet führt der Client keine erneute Authentifizierung durch -- werden jedoch zu viele Pakete versendet, so konnten wir beobachten wie das Endgerät sich mit einem eigentlich niedriger priorisiertem Netzwerk verbunden hat, da ihm einer erneuter Verbindungsaufbau anscheinend nicht möglich erschien. Ein Wert von 20 hat sich in unseren Versuchen als zielführend erwiesen.
 Ein Nachteil dieses Ansatzes ist, dass \texttt{aireplay-ng} mit dem Aussenden der Deauthentication-Frames wartet bis es einen Beacon-Frame des Access-Points erhalten hat -- eine technische Notwendigkeit hierfür besteht unserer Ansicht nach nicht.
 Alternativ kann die Deauthentifikation mit wenigen Zeilen Python-Code unter Verwendung der Bibliothek \texttt{Scapy} durchgeführt erden.
 
@@ -148,16 +149,16 @@ Kennt der Angreifer keine seinem Ziel bekannten SSIDs, so kann er das \texttt{-P
 	airbase-ng start -P -Z 4 <Interface>
 \end{Verbatim}
 
-\texttt{airbase-ng} wird nun auf dem ausgewählten Interface Probe-Requests von Clients auswerten, um automatisch Evil-Twins mit der vom Angreifer spezifizierten (Sicherheits-)Konfiguration zu erzeugen.
+\texttt{Airbase-ng} wird nun auf dem ausgewählten Interface Probe-Requests von Clients auswerten, um automatisch Evil-Twins mit der vom Angreifer spezifizierten (Sicherheits-)Konfiguration zu erzeugen.
 Es empfiehlt sich, gleichzeitig einen \texttt{airodump-ng} Prozess zu starten, welcher den Verkehr des Evil-Twins separat aufzeichnet.
 Dies hat den Hintergrund, dass die Aufzeichnung von \texttt{airbase-ng} ohne spezifizierte SSID via \texttt{--essid} Flag den Wert \texttt{default} als Netzwerknamen verwendet -- anstelle des Wertes aus dem Probe-Request. Dies führt in späteren Schritten zu Problemen, denn ohne gültige SSID werden Handshakes unbrauchbar, da diese in die Berechnung des PMK mit einfließt (und von \texttt{aircrack-ng} automatisch aus dem Dump extrahiert wird).
 
 \subsection{Handshake-Bruteforcing}\label{subs:cracking}
-Liegen valide Handshake-Mitschnitte vor, so kann der Angreifer versuchen den PSK offline brechen.
+Liegen valide Handshake-Mitschnitte vor, so kann der Angreifer versuchen den PSK offline zu brechen.
 Dafür spielt er die Schritte, die Client und AP während des Handshakes durchführen, lokal nach und wählt dabei in jedem Versuch einen neuen Passwortkandidaten.
 Die Vorgehensweise entspricht folgendem Algorithmus (siehe auch Abbildung~\ref{fig:wpa2handshake}):
 \begin{enumerate}
-	\item Berechne $\mathsf{PMK} = \mathsf{PBKDF2}(\mathsf{SSID}, \mathsf{PSK}, 4096)$\footnote{PBKDF2: \enquote{Password-based-key-derivation-function}, in RFC2898 genormte Funktion zur Ableitung von Schlüsseln aus einem Geheimnis.}
+	\item Berechne $\mathsf{PMK} = \mathsf{PBKDF2}(\mathsf{SSID}, \mathsf{PSK}, 4096, 256)$\footnote{PBKDF2: \enquote{Password-based-key-derivation-function}, in RFC2898 genormte Funktion zur Ableitung von Schlüsseln aus einem Geheimnis.}
 	\item Verwende die aufgezeichneten Noncen und berechne damit \\$\mathsf{PTK} = \mathsf{PRF}(\mathsf{Client-MAC},  \mathsf{Access-Point-MAC}, \mathsf{SNonce}, \mathsf{ANonce}, \mathsf{PMK})$\footnote{PRF ist eine Pseudonomierte-Zufalls-Funktion (PRF), ebenfalls im Standard definiert.}
 	\item Bilde den $\mathsf{MIC}$ über den $\mathsf{PTK}$-Kandidaten und vergleiche ihn mit dem aufgezeichneten $\mathsf{MIC'}$
 	\begin{enumerate}
