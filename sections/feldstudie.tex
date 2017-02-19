@@ -21,13 +21,13 @@ Es wurden verschiedene, zur Verfügung stehende Smartphones und Notebooks unters
 Zwar hängt die Durchführbarkeit eines Deauth-Angriffes nicht von seiner Nachweisbarkeit ab -- der Nutzen womöglich schon. Ist der Angriff offensichtlich und bspw. von einem (besseren) Router sicher detektierbar, so wird ein mitgeschnittenes Passwort u. U. sehr schnell durch ein neues ersetzt.
 Da keines der getesteten Endgeräte Schutzmechanismen gegenüber dem Deauthentication-Angriff aufweist, verzichten wir auf eine ausführliche Beschreibung und fokussieren uns auf dessen Erkennung auf Netzwerkebene. Allerdings wäre die Detektion auf dem attackierten Gerät selbst am sinnvollsten, denn ein Angriff könnte durchaus so ausgeführt werden, dass der AP keine Chance hat, die Deauthentication-Frames überhaupt zu empfangen.
 Ein Angreifer könnte in einem aufwendigeren Szenario seine Position zum Senden der Deauthentication-Frames\footnote{Wie in~\ref{subs:deauthentication-attack} erwähnt eignen sich auch Disassociation-Frames für die Durchführung dieses Angriffs} so wählen, dass die Reichweite den AP nicht mehr umfasst und mit einem zweiten Empfänger, welcher sowohl in Reichweite des Clients als auch des APs ist, den Handshake mitschneiden.
-Dafür wurde in dieser Feldstudie der Netzwerkverkehr in zwei verschiedenen Szenarien aufgezeichnet:
+Dies würde auch auf der Erkennung von Anomalien basierende Ansätze wie den in~\ref{cheema2011deauthentication} beschriebenen ins Leere laufen lassen. Wie plausibel eine solche Anomalieerkennung jedoch für das einfache Angriffsmodel erscheint, haben wir mit zwei Messungen in unterschiedlichen Umfeldern in Erfahrung bringen wollen:
 \begin{enumerate}
-	\item \textbf{WPA2-PSK Heimnetzwerk} mit einem Access-Point und 8 Teilnehmern, die sich selten aus der Reichweite des Access-Points entfernen
-	\item \textbf{WPA2-Enterprise Firmennetzwerk} mit 3 Access-Points und ca. 30 Teilnehmern, die sich häufig zwischen den einzelnen Access-Points bewegen
+	\item \textbf{WPA2-PSK Heimnetzwerk} mit einem (Endverbraucher-)AP und 8 Teilnehmern, die sich selten aus der Reichweite des Access-Points entfernen
+	\item \textbf{WPA2-Enterprise Firmennetzwerk} mit 3 (Enterprise-)APs und ca. 30 Teilnehmern, die sich häufig zwischen den einzelnen Access-Points bewegen
 \end{enumerate}
-Wir gehen davon aus, dass das Management des Firmennetzwerks, also unter anderem das Aussenden von Deauthentication-Frames, unabhängig vom konkreten WPA2-Authentifizierungsverfahren ist.
-Daher ist anzunehmen, dass sich ein WPA2-Enterprise geschütztes Netzwerk ähnlich verhält wie ein WPA2-PSK geschütztes.
+Wir gehen davon aus, dass das Verhalten des Managementsystem des Firmennetzwerk unabhängig vom konkreten WPA2-Authentifizierungsverfahren ist.
+Daher ist anzunehmen, dass sich ein WPA2-EAP geschütztes Netzwerk ähnlich einem WPA2-PSK geschützten verhält.
 Aus den Merkmalen des Verkehrs, wie beispielsweise Typ, Häufigkeit und Inhalt der Deauthentication-Frames, können wir Eigenschaften ableiten mit denen wir den Deauthentication-Angriff bezüglich seiner Praxistauglichkeit bewerten können.
 
 Im Heimnetzwerk konnte selbst nach 24 Stunden des Aufzeichnens kein Deauthentication-Frame beobachtet werden.
