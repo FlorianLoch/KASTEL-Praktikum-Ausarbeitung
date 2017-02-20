@@ -26,7 +26,7 @@ Im Fall von versteckten Netzwerken (\enquote{Hidden networks}) werden keine Beac
 \subsubsection{Probe-Request- und Probe-Response-Frames}\label{subs:probes}
 Mit Hilfe von Probe-Requests ist es einem Client möglich von sich aus nach Netzwerken in Reichweite zu suchen, deren SSID er kennt. 
 Neben den möglichen Übertragungsraten enthält ein Probe-Request-Frame die hier wesentliche SSID des gesuchten Netzwerkes. 
-Ein in Reichweite befindlicher AP, der dem über die SSID identifizierten Netzwerk zugeordnet ist, antwortet daraufhin mit einem Probe-Reponse-Frame -- allerdings nur, wenn die angegeben Übertragungsraten mit dem Netzwerk kompatibel sind. 
+Ein in Reichweite befindlicher AP, der dem über die SSID identifizierten Netzwerk zugeordnet ist, antwortet daraufhin mit einem Probe-Reponse-Frame -- allerdings nur, wenn die angegebenen Übertragungsraten mit dem Netzwerk kompatibel sind. 
 Aus technischer Sicht ist die Verwendung nur im Falle versteckter Netzwerke erforderlich -- die von uns in der Praxis beobachtete Sendefrequenz der Beacon-Frames ist so hoch, dass es der gezielten Nachfrage seitens des Clients nicht bedarf. 
 Diese Feststellung ist wichtig, da ein Endgerät hierdurch ihm bekannte Gegenstellen verrät. 
 Dadurch wird das Endgerät identifizierbar sowie anfällig für den in \ref{subs:evil-twin-attack} vorgestellten \enquote{Evil-Twin}-Angriff. 
@@ -34,7 +34,7 @@ Das Praxis-Verhalten verschiedener Geräte haben wir analysiert; Abschnitt~\ref{
 %TODO: Das hier in Grundlagen zu packen sehe ich eher kritisch, nimmt viel vorweg
 
 \subsubsection{Deauthentication-Frames}\label{subs:deauthentication-frames}
-Deauthentication-Frames können vom AP (aber auch von (authentifizierten) Clients) versendet werden um eine Neuauthentifizierung des Clients beim AP anzufordern oder einfach einen bereits laufenden Authentifizierungsversuch abzubrechen. 
+Deauthentication-Frames können vom AP (aber auch von Clients) versendet werden um eine Neuauthentifizierung des Clients beim AP anzufordern oder einfach einen bereits laufenden Authentifizierungsversuch abzubrechen. 
 Gemäß der Spezifikation gibt es vielfältige Gründe (sie listet insgesamt 66 an Zahl) für das Versenden eines Deauthentication-Frames. bspw.: Inaktivität, ungültiger Schlüssel, MAC-Adresse des Clients bereits in Netz vorhanden oder aus Gründen des Load-Balancings~\cite[S. 74, S. 442]{ieee802.11}.
 %TODO folgender teilsatz klingt komisch: ...durch Bewegen in eine andere Zelle des Netzwerkes und damit verbundener Wechsel des AP 
 Der konkrete Grund wird dem Client durch einen sogenannten \enquote{Reason-Code} als Teil des Frames signalisiert. 
@@ -70,7 +70,7 @@ Der Authenticator besitzt nun alle Parameter, um den PTK inklusive MIC zu berech
 Stimmt der von ihm gebildete MIC mit dem vom Supplicant übertragenen MIC überein so muss der Supplicant das korrekte Passwort kennen (oder eine Kollision der Hashfunktion gefunden haben).
 In den letzten beiden Schritten werden lediglich die Schlüssel installiert und der Handshake abgeschlossen.
 
-Abbildung \ref{fig:wpa2handshake} zeigt noch einmal anschaulich die Schritte, die während des Handshakes durchgeführt werden.
+Abbildung \ref{fig:wpa2handshake} zeigt anschaulich die Schritte, die während des Handshakes durchgeführt werden.
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.90\textwidth]{graphics/wpa2handshake}

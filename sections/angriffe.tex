@@ -13,7 +13,7 @@ Die im Standard beschriebenen Anforderungen an einen PSK legen lediglich eine L�
 Auch finden sich immer wieder Berichte über schlechte Standardpasswörter \cite{stanched2015defaultpasswords}, mit denen die Geräte seitens des Herstellers oder ISPs ausgeliefert werden. Die Hoffnung, auf ein schwaches Passwort zu stoßen ist daher keinesfalls unbegründet -- und wie später dargelegt werden soll, hängt die gesamte Sicherheit je nach Angriff vom am schwächsten gesicherten Netzwerk ab, dass dem Gerät bekannt ist.\\
 
 Eine weitere Spielweise sind Social-Engineering-Angriffe, die auf Unwissenheit, Unaufmerksamkeit und Leichtgläubigkeit der Nutzer setzen. 
-Durch die nachfolgend beschriebene \enquote{Auskunftsfreudigkeit} der meisten Endgeräte hinsichtlich ihrer bekannten Netzwerken ergeben sich für Tools dieser Kategorie Möglichkeiten ihre Angriffe plausibel und für die meisten Nutzer authentisch wirkend durchzuführen.
+Durch die nachfolgend beschriebene \enquote{Auskunftsfreudigkeit} der meisten Endgeräte hinsichtlich ihrer bekannten Netzwerke ergeben sich für Tools dieser Kategorie Möglichkeiten ihre Angriffe plausibel und für die meisten Nutzer authentisch wirkend durchzuführen.
 So strahlt zum Beispiel das Tool \textit{wifiphisher} über einen geeigneten Netzwerk-Adapter ein offenes Netzwerk mit beliebiger SSID aus und präsentiert verbundenen Nutzern je nach System verschiedene, teils täuschend echt aussehende Dialoge zur Eingabe des Netzwerkschlüssels. 
 Um einen Nutzer in das eigene Netzwerk zu bringen nutzt das Tool den später beschriebenen Deauth-Angriff. 
 
@@ -153,7 +153,7 @@ Kennt der Angreifer keine seinem Ziel bekannten SSIDs, so kann er das \texttt{-P
 	airbase-ng start -P -Z 4 <Interface>
 \end{Verbatim}
 
-\texttt{Airbase-ng} wird nun auf dem ausgewählten Interface Probe-Requests von Clients auswerten, um automatisch Evil-Twins mit der vom Angreifer spezifizierten (Sicherheits-)Konfiguration zu erzeugen.
+\texttt{airbase-ng} wird nun auf dem ausgewählten Interface Probe-Requests von Clients auswerten, um automatisch Evil-Twins mit der vom Angreifer spezifizierten Konfiguration zu erzeugen.
 Es empfiehlt sich, gleichzeitig einen \texttt{airodump-ng} Prozess zu starten, welcher den Verkehr des Evil-Twins separat aufzeichnet.
 Dies hat den Hintergrund, dass die Aufzeichnung von \texttt{airbase-ng} ohne spezifizierte SSID via \texttt{--essid} Flag \texttt{default} als Netzwerknamen verwendet -- anstelle des Wertes aus dem Probe-Request. Dies führt in späteren Schritten zu Problemen, denn ohne gültige SSID werden Handshakes unbrauchbar, da diese in die Berechnung des PMK mit einfließt (und von \texttt{aircrack-ng} automatisch aus dem Dump extrahiert wird).
 
