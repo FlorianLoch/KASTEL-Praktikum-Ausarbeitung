@@ -40,7 +40,7 @@ Gemäß der Spezifikation gibt es vielfältige Gründe (sie listet insgesamt 66 
 Der konkrete Grund wird dem Client durch einen sogenannten \enquote{Reason-Code} als Teil des Frames signalisiert. 
 Eine solche Anweisung kann vom Client nicht ignoriert werden, da der AP die Authentifizierung schlicht widerruft und den Client damit zur Neuanmeldung zwingt (\enquote{Deauthentication is not a request; it is a notification.}~\cite[S. 74]{ieee802.11}).
  
-Gerade bei Deauthentication-Frames birgt die unverschlüsselte, unauthentifizierte Übertragung ein Risiko.
+Gerade bei Deauthentication-Frames birgt die unverschlüsselte, unauthentifizierte Über\-tragung ein Risiko.
 So kann ein in Reichweite befindlicher Angreifer eine erneute Authentifizierung des Clients forcieren und unter Einsatz moderater Sendeleistung Angriffe gegen die Netzwerkverfügbarkeit einzelner Stationen in der Funkzelle fahren ohne im Besitz des Geheimnisses zu sein. 
 Die Thematik von \textit{Denial of Service}-Angriffen mit in der Spezifikation festgelegten Frame-Typen wird bspw. in \cite{bernaschi2008access} behandelt.
 %TODO: Das hier in Grundlagen zu packen sehe ich eher kritisch, nimmt viel vorweg, ist aber nicht so extrem wie oben finde ich (würde es drin lassen)

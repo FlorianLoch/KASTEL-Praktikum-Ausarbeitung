@@ -31,7 +31,7 @@ Dafür muss er lediglich abwarten, bis sich ein Client gegenüber einem AP im ge
 Abhängig von der Netzwerkinfrastruktur und des Nutzungsverhaltens des Clients kann dies jedoch viel Zeit in Anspruch nehmen.
 Da dies für einen gezielten Angriff nicht zielführend erscheint werden nachfolgend zwei Angriffe beschrieben, die durch aktives Eingreifen in den Netzwerkverkehr die Authentifizierung des Clients forcieren.
 
-\subsubsection{Deauth-Angriff}\label{subs:deauthentication-attack}
+\subsubsection{Deauth-Angriff}\label{subs:deauth-attack}
 Wie in Kapitel~\ref{sec:grundlagen} bereits beschrieben definiert IEEE 802.11 neben Daten- und Kontroll-Frames unter anderem auch Management-Frames, die der Verwaltung des Netzwerkes dienen und weder verschlüsselt noch anderweitig authentifiziert auf dem exponierten Übertragungsmedium versendet werden.
 
 Dies hat zur Folge, dass ein Angreifer Management-Frames erzeugen und im Netzwerk unter einem gefälschten Absender an beliebige Teilnehmer verteilen kann.
@@ -144,7 +144,7 @@ Dies äußert sich beim Client in Form einer Fehlermeldung wie zum Beispiel: \en
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.7\textwidth]{graphics/pyrit_analyze}
-	\caption[Pyrit]{Auch dem mitgeschnittenen Handshake sieht man an, dass es sich nur um einen \enquote{halben Handshake} handelt -- der obenstehende Aufruf von \texttt{pyrit} markiert ihn als \enquote{Bad}, da er nicht erfolgreich durchgeführt wurde. Für einen Angriff eignet er sich dennoch.}
+	\caption[Pyrit]{Auch dem mitgeschnittenen Handshake sieht man an, dass es sich nur um einen \enquote{halben Handshake} handelt -- der obenstehende Aufruf von \texttt{pyrit} markiert ihn als \enquote{Bad}, da er nicht erfolgreich bzw. komplett durchgeführt wurde. Für einen Angriff eignet er sich dennoch.}
 \end{figure}
 \FloatBarrier
 
