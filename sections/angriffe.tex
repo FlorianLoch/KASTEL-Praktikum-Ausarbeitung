@@ -1,5 +1,5 @@
 \section{Angriffe}
-Im Rahmen dieser Ausarbeitung wollen wir uns auf die Ermittlung des \textit{Pre-shared Keys} (\textit{PSK}) als Angriffsziel und auf den Angriffsvektor des Brechens mitgeschnitttener Handshakes durch Exploration des Schlüsselraumes (Bruteforce) beschränken.
+Im Rahmen dieser Ausarbeitung wollen wir uns auf die Ermittlung des \textit{Pre-Shared Keys} (\textit{PSK}) als Angriffsziel und auf den Angriffsvektor des Brechens mitgeschnitttener Handshakes durch Exploration des Schlüsselraumes (Bruteforce) beschränken.
 
 Tatsächlich gibt es nach dem bekannten Stand der Forschung keine Schwachstellen im Protokoll von WPA2-PSK, die es einem, nicht der Nutzergruppe angehörenden, Angreifer ermöglichen würden, die Kommunikation zu entschlüsseln. Es gibt bspw. eine Schwachstelle (\enquote{Hole 196}), die die Ermittlung des PTKs anderer Teilnehmer ermöglicht -- allerdings muss dem Angreifer hierfür der PSK bekannt sein, was die praktische Relevanz des Angriffes drastisch reduziert.
 
@@ -9,7 +9,8 @@ Da die Sicherheit eines solchen Verfahrens jedoch von mindestens drei Dingen abh
 So liegt die Wahl des Geheimnisses (in diesem Fall des Netzwerkschlüssels) meist in der Hand des nicht zwingend sachverständigen Endnutzers. 
 So kann ein schlecht gewähltes Passwort oftmals durch einen durchdachten Wörterbuchangriff in realistischer Zeit gebrochen werden, ohne das Protokoll als solches angreifen zu müssen.
 
-Die im Standard beschriebenen Anforderungen an einen PSK legen lediglich eine Länge von 8 Zeichen fest. \cite{zviran1999password} zufolge wählen Nutzer im Mittel lediglich 6 Zeichen lange Passwörter und greifen darauf in 8 von 10 Fällen ausschließlich auf Buchstaben zurück. Nur 13,7 \% der in dieser Studie analysierten Passwörter waren alphanumerisch. Auch wenn man davon ausgeht, dass Privatanwender für ihr WLAN womöglich ein vergleichsweise langes Passwort wählen, da sie es nicht täglich eingeben müssen -- so werden sie vermutlich weiterhin auf Wörter oder gängige Wort-Zahl-Kombinationen zurückgreifen, um es bspw. einfach an Gäste weitergeben zu können.
+Die im Standard beschriebenen Anforderungen an einen PSK legen lediglich eine Länge von 8 Zeichen fest. Eine Studie zufolge wählen Nutzer im Mittel lediglich 6 Zeichen lange Passwörter und greifen darauf in 8 von 10 Fällen ausschließlich auf Buchstaben zurück. Nur 13,7 \% der in dieser Studie analysierten Passwörter waren alphanumerisch \cite{zviran1999password}.
+Auch wenn man davon ausgeht, dass Privatanwender für ihr WLAN womöglich ein vergleichsweise langes Passwort wählen, da sie es nicht täglich eingeben müssen -- so werden sie vermutlich weiterhin auf Wörter oder gängige Wort-Zahl-Kombinationen zurückgreifen, um es bspw. einfach an Gäste weitergeben zu können.
 Auch finden sich immer wieder Berichte über schlechte Standardpasswörter \cite{stanched2015defaultpasswords}, mit denen die Geräte seitens des Herstellers oder ISPs ausgeliefert werden. Die Hoffnung, auf ein schwaches Passwort zu stoßen ist daher keinesfalls unbegründet -- und wie später dargelegt werden soll, hängt die gesamte Sicherheit je nach Angriff vom am schwächsten gesicherten Netzwerk ab, dass dem Gerät bekannt ist.\\
 
 Eine weitere Spielweise sind Social-Engineering-Angriffe, die auf Unwissenheit, Unaufmerksamkeit und Leichtgläubigkeit der Nutzer setzen. 
@@ -18,7 +19,7 @@ So strahlt zum Beispiel das Tool \textit{wifiphisher} über einen geeigneten Net
 Um einen Nutzer in das eigene Netzwerk zu bringen nutzt das Tool den später beschriebenen Deauth-Angriff. 
 
 \textit{Fluxion} prüft die vom Benutzer getätigten Eingaben zusätzlich gegen einen mitgeschnittenen Handshake ab und kann sich so dem Benutzer gegenüber authentisch Verhalten und Falscheingaben erkennen. 
-Dieser und weitere Angriffe, wie sie beispielsweise in~\cite{caneill2010attacks} beschrieben sind, sollen in dieser Ausarbeitung jedoch nicht weiter betrachtet werden, da ihr Ansatz ein grundlegend anderer ist.\\
+Dieser und weitere Angriffe, wie sie beispielsweise von Caneill und Gilis in ihrer Arbeit beschrieben sind, sollen in dieser Ausarbeitung jedoch nicht weiter betrachtet werden, da ihr Ansatz ein grundlegend anderer ist ~\cite{caneill2010attacks}.\\
 
 \subsection{Erfassen eines WPA2-Handshakes}
 Bei Bruteforce-Angriffen unterteilt sich die Ermittlung des Netzwerkschlüssels (PSK) in zwei elementare Schritte: 
@@ -47,7 +48,7 @@ Abbildung~\ref{fig:deauth-attack} zeigt ein solches Deauthentication-Frame sowie
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.7\textwidth]{graphics/deauth-attack}
+	\includegraphics[width=1\textwidth]{graphics/deauth-attack}
 	\caption[Deauthentication-Frame]{Abbildung eines Deauthentication-Frames~\cite{deauthframe}.}
 	\label{fig:deauth-attack}
 \end{figure}
@@ -84,7 +85,7 @@ Sind die MAC-Adressen des Clients und des AP bekannt startet der Angreifer mit H
 Das Flag \texttt{-0} kennzeichnet dabei den Deauth-Angriff.
 Via \texttt{<Anzahl>} kann spezifiziert werden, wie viele Deauthentication-Frames an das Ziel gesendet werden.
 In unseren Versuchen hat sich gezeigt, dass es meistens mehrerer Deauthentication-Pakete bedurfte, um den Client tatsächlich zu einem kurzzeitigen Verlassen des Netzwerkes zu bewegen. Die Wahl der Anzahl hat sich hierbei als Gratwanderung herausgestellt: werden zu wenig Pakete versendet führt der Client keine erneute Authentifizierung durch -- werden jedoch zu viele Pakete versendet, so konnten wir beobachten wie das Endgerät sich mit einem eigentlich niedriger priorisiertem Netzwerk verbunden hat, da ihm einer erneuter Verbindungsaufbau anscheinend nicht möglich erschien. Ein Wert von 20 hat sich in unseren Versuchen als zielführend erwiesen.
-Ein Nachteil dieses Ansatzes ist, dass \texttt{aireplay-ng} mit dem Aussenden der Deauthentication-Frames wartet bis es einen Beacon-Frame des Access-Points erhalten hat -- eine technische Notwendigkeit hierfür besteht unserer Ansicht nach nicht.
+Ein Nachteil dieses Ansatzes ist, dass \texttt{aireplay-ng} mit dem Aussenden der Deauthentication-Frames wartet bis es einen Beacon-Frame (dienen der Bekanntmachung eines Netzwerkes bzw. der verwendeten Konfiguration durch den AP) des AP erhalten hat -- eine technische Notwendigkeit hierfür besteht unserer Ansicht nach nicht.
 Alternativ kann die Deauthentifikation mit wenigen Zeilen Python-Code unter Verwendung der Bibliothek \texttt{Scapy} durchgeführt erden.
 
 \begin{minted}[breakbytoken,breaklines]{python}
@@ -103,6 +104,18 @@ Andernfalls wird \texttt{Pyrit} für eventuell weitere aufgezeichnete Handshakes
 \end{Verbatim}
 Ein im Rahmen der Arbeit geschriebenes Python-Skript, welches unter Anderem die oben beschriebenen Schritte automatisiert, findet sich auf \textit{GitHub}\footnote{\href{https://github.com/kastel-wpa2/deauth-tool/blob/master/deauth_jammer.py}{https://github.com/kastel-wpa2/deauth-tool/blob/master/deauth\_jammer.py}}. Ein ebenfalls für diese Arbeit gebautes Tool nutzt unter anderem dieses Skript, um Deauth-Angriffe und das vorangehende Scannen des Netzwerkverkehrs komfortabel über eine Weboberfläche zu ermöglichen\footnote{\href{https://github.com/kastel-wpa2/deauth-tool/blob/master/tool.py}{https://github.com/kastel-wpa2/deauth-tool/blob/master/tool.py}}.
 Der Versuch des Brechens des erlangten Handshakes wird in Unterkapitel~\ref{subs:cracking} erläutert.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{graphics/tindahr_1}
+	\caption[TINDAR -- Übersicht]{Screenshot von \textit{TINDAHR}, einem für diese Arbeit entwickelten, interaktiven Tool für Deauth-Attacken. Übersicht der Verbindungen.}
+\end{figure}
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{graphics/tindahr_2}
+	\caption[TINDAR -- Konfiguration Angriff]{Konfiguration eines Angriffes.}
+\end{figure}
+\FloatBarrier
 
 \subsubsection{\enquote{Evil-Twin}-Angriff}\label{subs:evil-twin-attack}
 Ein Nachteil des Deauth-Angriffs ist, dass sowohl Client als auch AP in Reichweite des Angreifers sein müssen (\enquote{on-site}), um den Handshake zwischen beiden abfangen zu können. Der Evil-Twin-Angriff als \enquote{off-site}-Attacke hebt diese Beschränkung auf. Die Idee hierbei ist, einen AP zu imitieren, der einem dem Client bekannten Netzwerk angehört. Auf diese Weise wird der Client zur Durchführung eines Handshakes verleitet, auch wenn das eigentliche Netzwerk nicht in Reichweite ist. 
@@ -194,7 +207,7 @@ Sofern während der Aufzeichnung sichergestellt wurde, dass ausschließlich Verk
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.7\textwidth]{graphics/aircrack_success}
+	\includegraphics[width=\textwidth]{graphics/aircrack_success}
 	\caption[Aircrack-ng]{\texttt{aircrack-ng} hat den gültigen PSK gefunden}
 \end{figure}
 
