@@ -15,12 +15,34 @@
 \usepackage[margin=2.5cm]{geometry}
 \usepackage[hidelinks]{hyperref}
 \usepackage[backend=bibtex,style=numeric,sorting=none,date=long,hyperref=true]{biblatex} %sorting=none sorts by position of appearance
+\usepackage{ulem}
+
+\newcommand*{\qqquad}{\qquad\qquad\qquad\qquad}
 
 \addbibresource{lit} 
 
 \begin{document}
 
 \input{sections/titlepage.tex}
+
+\newif\ifsigned
+\signedtrue
+% \signedfalse
+
+\ifsigned
+	\newpage
+	\section*{Erklärung}
+	Mit unseren Unterschriften bestätigen wir, dass die vorliegende Arbeit selbstständig verfasst und keine anderen als die angegebenen Quellen und Hilfsmittel verwendet wurden.\\
+	
+	% Zeile für Unterschrift
+	\begin{flushleft}
+		\uline{Ort:\qqquad\qqquad}\quad\uline{Datum:\qqquad\qqquad}\\
+		\vspace{1cm}
+		\uline{Florian Loch:\qqquad\qquad\qquad}\quad\uline{Benny Görzig:\qqquad\qquad\quad}
+	\end{flushleft}
+	\vfill
+	\newpage
+\fi
 
 \tableofcontents
 
